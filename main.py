@@ -1,8 +1,7 @@
-from lxml import html
+'''from lxml import html
 import requests
 
-import gui as gui
-import test_data as tdata
+
 
 COUNTRIES = [
     'Belgium',
@@ -118,11 +117,74 @@ def load():
         data[country] = get_country(LINK, country)
     return data
 
+'''
 
-if __name__ == '__main__':
-    # data = load()
-    # print(data)
-    data = tdata.const_data()
-    gui.test_window(data)
+# import test_data as tdata
+import sys
+import urllib.request as ur
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+from PyQt5.QtGui import QPixmap
 
-    #gui.window(data)
+VER = '3'
+
+LINK = 'http://swmedia-4cd6.kxcdn.com/media/catalogue/USSR/Postage-stamps/ZW-s.jpg'
+
+'''
+from PyQt5.QtQml import qmlRegisterType, QQmlComponent, QQmlApplicationEngine
+def window():
+    # app = QApplication(sys.argv)
+
+    app = QApplication(sys.argv)
+
+    # Create a QML engine.
+    engine = QQmlApplicationEngine('main.qml')
+    print('0')
+    # engine.load()
+    print('1')
+
+    # Create a component factory and load the QML script.
+    # component = QQmlComponent(engine)
+    # print('2')
+    # component.loadUrl(QUrl('main.qml'))
+    # print('3')
+
+    # Create an instance of the component.
+    # qml = component.create()
+    print('4')
+
+    if engine is not None:
+        sys.exit(app.exec_())
+        '''
+
+def test_window():
+    app = QApplication(sys.argv)
+    widget = QWidget(windowTitle="Stamps((")
+    widget.setStyleSheet('background-color: blue;')
+    text_label = QLabel('TEXT ' + VER, widget)
+    link = LINK
+    print('!!! 1')
+    try:
+        # data = ur.urlopen(link).read()
+        image = QPixmap(link)
+        # image.loadFromData(data)
+        text_label.setPixmap(image)
+    except Exception as err:
+        text_label.setText('FAILED: ', err)
+
+    text_label.move(0, 0)
+    text_label.resize(300, 80)
+    text_label.setStyleSheet('background-color: black; color: cyan;')
+    widget.show()
+    ret = app.exec_()
+    sys.exit(ret)
+
+test_window()
+
+
+# data = load()
+
+# data = tdata.const_data()
+# print(data)
+# gui.test_window(data)
+
+# gui.window(data)

@@ -1,33 +1,48 @@
-import sys
+'''import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot
 
 
-from PyQt5.QtQml import qmlRegisterType, QQmlComponent, QQmlApplicationEngine
+from PyQt5.QtQml import qmlRegisterType, QQmlComponent, QQmlApplicationEngine'''
+
+
+
+'''
 
 import urllib.request as ur
 
-def test_window(data):
-    app = QApplication(sys.argv)
-    widget = QWidget()
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+from PyQt5.QtGui import QPixmap
 
-    textLabel = QLabel('TEXT', widget)
+def test_window(data):
+    print('111')
+    app = QApplication(sys.argv)
+    print('222')
+    widget = QWidget()
+    widget.setStyleSheet('background-color: red;')
+    print('333')
+    text_label = QLabel('TEXT', widget)
     link = data['USSR']['default'][0]['images'][0]
     try:
         data = ur.urlopen(link).read()
         image = QPixmap()
         image.loadFromData(data)
-        textLabel.setPixmap(image)
+        text_label.setPixmap(image)
     except:
-        textLabel.setText('FAILED')
-    textLabel.move(0, 0)
-
-    widget.setGeometry(50, 50, 320, 200)
-    widget.setWindowTitle("PyQt5 Example")
+        text_label.setText('FAILED')
+    text_label.move(0, 0)
+    text_label.resize(100, 100)
+    print('444')
     widget.show()
-    sys.exit(app.exec_())
+    print('555')
+    ret = app.exec_()
+    print('!!', ret)
+    sys.exit(ret)
+'''
 
+'''
 def window(data):
     # app = QApplication(sys.argv)
 
@@ -51,3 +66,4 @@ def window(data):
 
     if engine is not None:
         sys.exit(app.exec_())
+        '''

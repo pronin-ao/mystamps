@@ -1,6 +1,8 @@
 
 def const_data():
-    _data = {'Belgium': {'default': [{'year': '1955', 'capture': 'BelgianInventors', 'stamps': ['1.20+30\xa0Fr/C'],
+    _data = {
+        'Belgium': {
+        'default': [{'year': '1955', 'capture': 'BelgianInventors', 'stamps': ['1.20+30\xa0Fr/C'],
                                       'images': [
                                           'https://swmedia-4cd6.kxcdn.com/media/catalogue/Belgium/Postage-stamps/TG-s.jpg']},
                                      {'year': '1956', 'capture': 'TheelectricrailroadBruxelles-Luxembourg',
@@ -225,7 +227,8 @@ def const_data():
                              {'year': '2000', 'capture': 'FreightTraffic',
                               'stamps': ['20/0.50Fr/€', '30/0.74Fr/€', '50/1.24Fr/€', '150/3.72Fr/€', ''], 'images': [
                                  'https://swmedia-4cd6.kxcdn.com/media/catalogue/Belgium/Railway-parcelpost-stamps/0445-b.jpg']}]},
-             'Austria': {'default': [
+        'Austria': {
+            'default': [
                  {'year': '1937', 'capture': 'The100thAnniversaryofAustrianRailroads', 'stamps': ['12G', '25G'],
                   'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/Austria/Postage-stamps/GZ-s.jpg',
                              'https://swmedia-4cd6.kxcdn.com/media/catalogue/Austria/Postage-stamps/HA-s.jpg']},
@@ -354,7 +357,9 @@ def const_data():
                   'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/Austria/Postage-stamps/DRF-s.jpg']},
                  {'year': '2020', 'capture': 'Trains-RailwayClassVT10', 'stamps': ['230(C)'],
                   'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/Austria/Postage-stamps/DTA-s.jpg']}],
-                         'Railway+parcelpost+stamps': None}, 'Poland': {'default': [
+                         'Railway+parcelpost+stamps': None},
+        'Poland': {
+            'default': [
             {'year': '1948', 'capture': 'EuropeanRailwaySchedulingConference,Kraków', 'stamps': ['18Zł'],
              'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/Poland/Postage-stamps/JM-s.jpg']},
             {'year': '1954', 'capture': 'TheDevelopmentofElectricRailways', 'stamps': ['60Gr', '80Gr'],
@@ -379,13 +384,16 @@ def const_data():
              'stamps': ['2.60Zł', '3.20Zł', ''],
              'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/Poland/Postage-stamps/HZE-s.jpg',
                         'https://swmedia-4cd6.kxcdn.com/media/catalogue/Poland/Postage-stamps/HZF-s.jpg']}],
-                                                                        'Railway+parcelpost+stamps': None}, 'Russia': {
+                                                                        'Railway+parcelpost+stamps': None},
+        'Russia': {
             'default': [{'year': '1922', 'capture': 'CharityforHungerVictims', 'stamps': ['R'],
                          'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/Russia/Postage-stamps/BV-s.jpg']},
                         {'year': '2018', 'capture': 'MonumentalArtoftheMoscowMetro',
                          'stamps': ['40₽', '40₽', '40₽', '40₽', ''], 'images': [
                             'https://swmedia-4cd6.kxcdn.com/media/catalogue/Russia/Postage-stamps/2611-b.jpg']}],
-            'Railway+parcelpost+stamps': None}, 'USSR': {'default': [
+            'Railway+parcelpost+stamps': None},
+        'USSR': {
+            'default': [
             {'year': '1946', 'capture': 'FiveYearReconstructionPlan', 'stamps': ['15K'],
              'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/USSR/Postage-stamps/ZW-s.jpg']},
             {'year': '1948', 'capture': 'Five-YearPlaninFourYear', 'stamps': ['60K', '1R'],
@@ -421,5 +429,6 @@ def const_data():
                         'https://swmedia-4cd6.kxcdn.com/media/catalogue/USSR/Postage-stamps/GUG-s.jpg']},
             {'year': '1991', 'capture': 'Стандартныйвыпуск', 'stamps': ['7K'],
              'images': ['https://swmedia-4cd6.kxcdn.com/media/catalogue/USSR/Postage-stamps/HOL-s.jpg']}],
-                                                         'Railway+parcelpost+stamps': None}}
+                                                         'Railway+parcelpost+stamps': None}
+    }
     return _data
