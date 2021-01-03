@@ -1,3 +1,5 @@
+from base64 import b64encode
+import json
 from lxml import html
 import requests
 import urllib.request as ur
@@ -20,7 +22,7 @@ FULL_COUNTRIES = [
     'USSR',
 ]
 
-COUNTRIES = BIG_TEST_COUNTRIES
+COUNTRIES = SHORT_TEST_COUNTRIES
 
 CATEGORIES = [
     None,
@@ -66,6 +68,9 @@ def clrstr(string):
     return string.replace('\\n', '').replace('\t', '').replace(' ', '').replace('\n', '')
 
 
+ENCODING = 'utf-8'
+
+
 def parse_response(tree):
     full_prices = []
     series = tree.xpath(SERIES_PATH)
@@ -90,10 +95,12 @@ def parse_response(tree):
         seria['images'] = []
         for image_url in images:
             try:
-                data = ur.urlopen(image_url).read()
-                seria['images'].append(data)
-            except:
-                print('load {} failed', image_url)
+                raw_data = ur.urlopen(image_url).read()
+                b64_bytes = b64encode(raw_data)
+                string_data = b64_bytes.decode(ENCODING)
+                seria['images'].append(string_data)
+            except Exception as err:
+                print('load {} failed: {}', image_url, err)
 
 
         series_map.append(seria)
@@ -136,8 +143,10 @@ def load():
         data[country] = get_country(LINK, country)
     return data
 
+
 data = load()
-print(data)
-fout = open('../db/stamp_base', 'wt')
+fout = open('stamp_base.json', 'wt')
+data_json = json.dumps(data)
+print(data_json)
 print(data, file=fout)
 fout.close()
