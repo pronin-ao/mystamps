@@ -1,15 +1,27 @@
 from lxml import html
 import requests
+import urllib.request as ur
 
 
 
-COUNTRIES = [
+SHORT_TEST_COUNTRIES = [
+    'Russia',
+]
+
+BIG_TEST_COUNTRIES = [
+    'Belgium'
+]
+
+FULL_COUNTRIES = [
     'Belgium',
     'Austria',
     'Poland',
     'Russia',
     'USSR',
 ]
+
+COUNTRIES = BIG_TEST_COUNTRIES
+
 CATEGORIES = [
     None,
     'Railway+parcelpost+stamps'
@@ -75,7 +87,14 @@ def parse_response(tree):
             seria['stamps'] = str_prices
 
         images = part.xpath(IMAGES_PATH)
-        seria['images'] = images
+        seria['images'] = []
+        for image_url in images:
+            try:
+                data = ur.urlopen(image_url).read()
+                seria['images'].append(data)
+            except:
+                print('load {} failed', image_url)
+
 
         series_map.append(seria)
 
@@ -116,3 +135,9 @@ def load():
     for country in COUNTRIES:
         data[country] = get_country(LINK, country)
     return data
+
+data = load()
+print(data)
+fout = open('stamp_base', 'wt')
+print(data, file=fout)
+fout.close()
