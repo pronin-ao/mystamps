@@ -138,6 +138,6 @@ def load():
 
 data = load()
 print(data)
-fout = open('stamp_base', 'wt')
+fout = open('../db/stamp_base', 'wt')
 print(data, file=fout)
 fout.close()
