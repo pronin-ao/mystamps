@@ -114,7 +114,7 @@ def request_and_parse(link):
     resp = requests.get(link)
     print(resp.status_code)
     if resp.status_code != 200:
-        return
+        return []
 
     list = []
 

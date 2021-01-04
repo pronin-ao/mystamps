@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/db">
+        <file alias="stamps">res/short_stamp_base.json</file>
+    </qresource>
+</RCC>
