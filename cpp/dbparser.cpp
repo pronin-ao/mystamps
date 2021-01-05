@@ -64,7 +64,7 @@ db::Country ParseSpec(const QJsonValue& json, const db::Spec& spec){
       const auto& year_it = object.find(names::kYear);
       if(year_it == object.end())
         throw std::runtime_error("Seria has no year");
-      const db::YearVal year = year_it->toInt();
+      const db::YearVal year = year_it->toString().toStdString();
       const auto& seria = ParseSeries(object, spec);
       const auto& name_it = object.find(names::kCapture);
       if(name_it == object.end())
@@ -81,6 +81,8 @@ void AppendTo(db::Country& global, const db::Country& spec) {
   for(const auto& [key, val] : spec){
       if(global.count(key))
         global[key].merge(db::Year{val});
+      else
+        global.emplace(key,val);
     }
 }
 

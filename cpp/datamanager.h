@@ -1,8 +1,11 @@
 #pragma once
 
+#include<set>
+
 #include <QObject>
 
 #include "dbmodel.h"
+#include "catalogue.h"
 
 
 class DataManager : public QObject
@@ -11,11 +14,20 @@ class DataManager : public QObject
 public:
   explicit DataManager(QObject *parent = nullptr);
 
-  inline uint size() { return _size;}
+  void setCatalogue(Catalogue* catalogue);
+
+public slots:
+  void applyCountriesFilter(const QStringList& filter);
 
  private:
-  uint _size;
   db::Catalogue _db;
+
+  void collectAllFilters();
+
+  std::set<std::string> _countries;
+  std::set<std::string> _years;
+
+  Catalogue* _catalogue;
 
 signals:
 

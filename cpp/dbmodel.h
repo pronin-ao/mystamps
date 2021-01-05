@@ -17,9 +17,8 @@ namespace db {
   using Series = std::vector<Stamp>;
   using SeriesName = std::string;
   using Year = std::unordered_map<SeriesName, Series>;
-  using YearVal = short;
+  using YearVal = std::string;
   using Country = std::unordered_map<YearVal, Year>;
   using CountryName = std::string;
   using Catalogue = std::unordered_map<CountryName, Country>;
-
 }
