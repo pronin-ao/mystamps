@@ -14,9 +14,9 @@ namespace names {
 }
 
 
-QString GetWithDefault(const QJsonArray& array, int index,
+QString GetWithDefault(const QJsonArray& array, size_t index,
                        const QString& def = "") {
-  if(index >= array.size())
+  if(index >= static_cast<size_t>(array.size()))
     return def;
   return array[index].toString();
 }
@@ -39,15 +39,19 @@ db::Series ParseSeries(const QJsonObject& json, const db::Spec& spec) {
   if(images.size() > stamps.size())
     qWarning() << "We have more images then stamps, some images will be dummy";
 
-  int i = 0;
+  size_t i = 0;
   res.reserve(images.size());
   for(const auto& image: images){
       const auto& stamp = GetWithDefault(stamps, i);
       db::Stamp new_stamp{
+        i,
         image.toString().toStdString(),
-        spec, stamp.toStdString()
+        spec,
+        stamp.toStdString(),
+        "###"
       };
       res.emplace_back(std::move(new_stamp));
+      ++i;
     }
   return res;
 }

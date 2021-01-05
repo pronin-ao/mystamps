@@ -101,6 +101,18 @@ Rectangle{
             text: "inv"
             Layout.fillWidth: true; Layout.fillHeight: true
             Layout.topMargin: 2
+            onClicked: {
+                var new_filtered = filterModel.slice();
+                var value;
+                for(value of filtered){
+                    var ind = new_filtered.indexOf(value);
+                    if(ind >= 0){
+                        new_filtered.splice(ind,1);
+                    }
+                }
+                filtered = []
+                filtered = new_filtered.slice()
+            }
         }
         Button {
             id: none

@@ -6,5 +6,7 @@
         <file>main.qml</file>
         <file>qml/Filter.qml</file>
         <file>qml/Stamp.qml</file>
+        <file>qml/StampList.qml</file>
+        <file>qml/Menu.qml</file>
     </qresource>
 </RCC>

@@ -5,6 +5,7 @@ import requests
 import urllib.request as ur
 
 
+TEST = True
 
 SHORT_TEST_COUNTRIES = [
     'Russia',
@@ -37,6 +38,9 @@ FULL_COUNTRIES = [
 ]
 
 COUNTRIES = FULL_COUNTRIES
+
+if TEST:
+    COUNTRIES = ['Cuba']
 
 CATEGORIES = [
     None,
@@ -110,9 +114,11 @@ def parse_response(tree):
         seria['images'] = []
         for image_url in images:
             try:
-                raw_data = ur.urlopen(image_url).read()
-                b64_bytes = b64encode(raw_data)
-                string_data = b64_bytes.decode(ENCODING)
+                string_data = "__image__"
+                if not TEST:
+                    raw_data = ur.urlopen(image_url).read()
+                    b64_bytes = b64encode(raw_data)
+                    string_data = b64_bytes.decode(ENCODING)
                 seria['images'].append(string_data)
             except Exception as err:
                 print('load {} failed: {}', image_url, err)
@@ -160,8 +166,9 @@ def load():
 
 
 data = load()
-fout = open('stamp_base.json', 'wt')
 data_json = json.dumps(data)
 print(data_json)
-print(data_json, file=fout)
-fout.close()
+if not TEST:
+    fout = open('stamp_base.json', 'wt')
+    print(data_json, file=fout)
+    fout.close()

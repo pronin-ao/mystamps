@@ -10,9 +10,11 @@ namespace db {
   using Spec = std::string;
   using Price = std::string;
   struct Stamp{
+    size_t index = -1;
     Image image = "";
     Spec spec = "";
     Price price = "";
+    Spec number = "";
   };
   using Series = std::vector<Stamp>;
   using SeriesName = std::string;

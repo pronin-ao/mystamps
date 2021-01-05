@@ -53,18 +53,7 @@ void DataManager::setCatalogue(Catalogue *catalogue)
   catalogue->setYearsFilter(years);
   catalogue->setYears(std::move(years));
 
-  QStringList stamps;
-  for(const auto& country: _db)
-    for(const auto& year: country.second)
-      for(const auto& series: year.second){
-          std::transform(series.second.begin(), series.second.end(),
-                         std::back_inserter(stamps),
-                         [](const auto& stamp){
-              return "data:image/jpg;base64,"+QString::fromStdString(stamp.image);
-            });
-        }
-  qDebug() << "Collected "<<stamps.size() <<"stamps";
-  catalogue->setStamps(std::move(stamps));
+  applyYearsFilter({});
 }
 
 void DataManager::collectAllFilters()
@@ -104,18 +93,38 @@ void DataManager::applyCountriesFilter(const QStringList &countries) {
 }
 
 void DataManager::applyYearsFilter(const QStringList &years) {
-  QStringList stamps;
-  for(const auto& [name, country]: _db)
-    if(_country_filter.contains(QString::fromStdString(name)))
-      for(const auto& [year, data]: country)
-        if(years.empty() || years.contains(QString::fromStdString(year)))
+  QVariantList stamps;
+  for(const auto& [name, country]: _db){
+    const auto& country_name = name;
+    if(static_cast<size_t>(_country_filter.size())== _countries.size() ||
+       _country_filter.empty() ||
+       _country_filter.contains(QString::fromStdString(name)))
+      for(const auto& [year_val, data]: country) {
+        const auto& year = year_val;
+        if(years.empty() || years.contains(QString::fromStdString(year))){
           for(const auto& series: data){
-            std::transform(series.second.begin(), series.second.end(),
-                         std::back_inserter(stamps),
-                         [](const auto& stamp){
-              return "data:image/jpg;base64,"+QString::fromStdString(stamp.image);
-              });
+              std::transform(series.second.begin(), series.second.end(),
+                           std::back_inserter(stamps),
+                           [&cap=series.first, &year, &name=country_name](const auto& stamp){
+                  QVariant var;
+                var.setValue(
+                      Stamp{
+                        QString::fromStdString(cap),
+                        "data:image/jpg;base64,"+QString::fromStdString(stamp.image),
+                        QString::fromStdString(stamp.price),
+                        stamp.index,
+                        QString::fromStdString(year),
+                        QString::fromStdString(name),
+                        QString::fromStdString(stamp.spec),
+                        false /*checked*/,
+                        QString::fromStdString(stamp.number)
+                      });
+                return var;
+                });
+            }
           }
+        }
+  }
   qDebug() << "Collected "<<stamps.size() <<"stamps";
   _catalogue->setStamps(std::move(stamps));
 }
