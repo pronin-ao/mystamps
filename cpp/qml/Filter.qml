@@ -16,6 +16,38 @@ Rectangle{
     signal apply(var new_filter)
     signal restore(var old_filter)
 
+    ListView {
+        id: list
+        anchors.bottom: parent.bottom
+        height: parent.height * 3 / 4
+        width: parent.width
+        cacheBuffer: 0
+
+        Component {
+            id: filterDelegate
+            CheckDelegate {
+                height: list.height / 10
+                width: list.width
+                text: modelData
+                checked: {filtered.indexOf(modelData) >= 0}
+
+                onCheckedChanged: {
+                    if(checked) {
+                        if(filtered.indexOf(modelData) < 0)
+                            filtered.push(modelData);
+                    }
+                    else {
+                        var ind = filtered.indexOf(modelData);
+                        filtered.splice(ind, 1);
+                    }
+                }
+            }
+        }
+
+        model: parent.filterModel
+        delegate: filterDelegate
+    }
+
 
     RowLayout {
         id: result
@@ -60,6 +92,9 @@ Rectangle{
             text: "all"
             Layout.fillWidth: true; Layout.fillHeight: true
             Layout.topMargin: 2; Layout.leftMargin: 2
+            onClicked: {
+                filtered = filterModel;
+            }
         }
         Button {
             id: inv
@@ -72,40 +107,11 @@ Rectangle{
             text: "none"
             Layout.fillWidth: true; Layout.fillHeight: true
             Layout.topMargin: 2; Layout.rightMargin: 2
-        }
-    }
-
-    ListView {
-        id: list
-        anchors.top: quickers.bottom
-        height: parent.height * 3 / 4
-        width: parent.width
-
-        Component {
-            id: filterDelegate
-            CheckDelegate {
-                height: list.height / 10
-                width: list.width
-                text: modelData
-                checked: {filtered.indexOf(modelData) >= 0}
-
-                onCheckedChanged: {
-                    if(checked) {
-                        if(filtered.indexOf(modelData) < 0)
-                            filtered.push(modelData);
-                    }
-                    else {
-                        var ind = filtered.indexOf(modelData);
-                        filtered.splice(ind, 1);
-                    }
-                }
+            onClicked: {
+                filtered = [];
             }
         }
-
-        model: parent.filterModel
-        delegate: filterDelegate
     }
-
 
 }
 

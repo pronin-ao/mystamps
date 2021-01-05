@@ -24,6 +24,67 @@ Window{
     }
 
     Rectangle {
+        id: content
+        width: parent.width
+        height: parent.height - menu.height
+        color: "black"
+        anchors.bottom: parent.bottom
+
+        GridView {
+            id: grid
+            anchors.fill: parent
+            cellWidth: content.width / 2
+            cellHeight: content.height / 4
+            visible: true
+
+            Component{
+                id: stampDelegate
+                Rectangle{
+                    Image{
+                        width: content.width / 2
+                        height: content.height / 4
+                        id: image
+                        source: modelData
+                        fillMode: Image.PreserveAspectFit
+                        MouseArea {
+                            anchors.fill: parent
+                            onPressAndHold: {
+                                console.log("work")
+                                showStamp.visible = true;
+                                stamp.source = modelData;
+                                grid.visible = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            model: catalogue.stamps
+            delegate: stampDelegate
+
+        }
+
+        Rectangle{
+            id: showStamp
+            visible: false
+            anchors.fill: parent
+            color: "#202020"
+            Image {
+                id: stamp
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+            }
+            MouseArea {
+                anchors.fill: parent
+                onPressAndHold: {
+                    showStamp.visible = false;
+                    grid.visible = true;
+                }
+            }
+        }
+    }
+
+    Rectangle {
         id: menu
         width: parent.width
         color: "gray"
@@ -68,6 +129,7 @@ Window{
 
     Custom.Filter {
         id: filter
+        visible: false
 
         onApply: {
             if(mainWindow.filterType == "countries")
@@ -84,34 +146,4 @@ Window{
         }
     }
 
-    Rectangle {
-        id: content
-        width: parent.width
-        height: parent.height - menu.height
-        color: "black"
-        anchors.top: menu.bottom
-
-        GridView {
-            id: grid
-            anchors.fill: parent
-            cellWidth: content.width / 2
-            cellHeight: content.height / 5
-
-            Component{
-                id: stampDelegate
-                Rectangle{
-                    Image{
-                        id: image
-                        source: modelData
-                    }
-                    height: image.contentHeight
-                    width: image.contentWidth
-                }
-            }
-
-            model: catalogue.stamps
-            delegate: stampDelegate
-
-        }
-    }
 }

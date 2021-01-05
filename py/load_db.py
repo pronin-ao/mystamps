@@ -20,13 +20,28 @@ FULL_COUNTRIES = [
     'Poland',
     'Russia',
     'USSR',
+    'St.-Lucia',
+    'Union-Island',
+    'St.-Vincent-And-The-Grenadines',
+    'St.-Vincent',
+    'Grenadines-Of-St.-Vincent',
+    'Bequia',
+    'Cuba',
+    'Tuvalu',
+    'Vaitupu',
+    'Niutao',
+    'Funafuti',
+    'Nanumea',
+    'Nui',
+    'Nukufetau',
 ]
 
 COUNTRIES = FULL_COUNTRIES
 
 CATEGORIES = [
     None,
-    'Railway+parcelpost+stamps'
+    'Railway+parcelpost+stamps',
+    'Parcel+post+stamps',
 ]
 
 URL = 'https://www.stampworld.com'

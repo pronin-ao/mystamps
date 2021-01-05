@@ -56,6 +56,7 @@ signals:
   void stampsUpdated();
 
   void sendCountriesFilter(const QStringList&);
+  void sendYearsFilter(const QStringList&);
 
 private:
   QStringList _years = {};

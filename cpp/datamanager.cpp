@@ -18,6 +18,17 @@ QString ReadFile(){
   return val;
 }
 
+QStringList QStringListFromSet(const std::set<std::string>& set) {
+  QStringList res;
+  res.reserve(set.size());
+  std::transform(set.begin(), set.end(),
+                 std::back_inserter(res),
+                 [](const auto& std_str){
+      return QString::fromStdString(std_str);
+    });
+  return res;
+}
+
 
 DataManager::DataManager(QObject *parent) : QObject(parent)
 {
@@ -31,27 +42,14 @@ void DataManager::setCatalogue(Catalogue *catalogue)
   _catalogue = catalogue;
   connect(catalogue, &Catalogue::sendCountriesFilter,
           this, &DataManager::applyCountriesFilter);
+  connect(catalogue, &Catalogue::sendYearsFilter,
+          this, &DataManager::applyYearsFilter);
 
-  qDebug() << "in size: "<<_countries.size();
-  QStringList countries;
-  countries.reserve(_countries.size());
-  std::transform(_countries.begin(), _countries.end(),
-                 std::back_inserter(countries),
-                 [](const auto& std_str){
-      return QString::fromStdString(std_str);
-    });
-  qDebug() << "out size: "<<countries.size();
+  auto countries = QStringListFromSet(_countries);
   catalogue->setCountriesFilter(countries);
   catalogue->setCountries(std::move(countries));
 
-  QStringList years;
-  qDebug() << "in size "<<_years.size();
-  years.reserve(_years.size());
-  std::transform(_years.begin(), _years.end(),
-                 std::back_inserter(years),
-                 [](const auto& std_str){
-      return QString::fromStdString(std_str);});
-  qDebug() << "out size "<<years.size();
+  auto years = QStringListFromSet(_years);
   catalogue->setYearsFilter(years);
   catalogue->setYears(std::move(years));
 
@@ -79,23 +77,47 @@ void DataManager::collectAllFilters()
           _years.insert(year);
         }
     }
-  qDebug() << "Filters built";
 }
 
-void DataManager::applyCountriesFilter(const QStringList &filter)
+void DataManager::filterYearsForCountry()
 {
+  if(_country_filter.size() == _country_filter.size()){
+      auto all_years = QStringListFromSet(_years);
+      _catalogue->setYears(std::move(all_years));
+    }
+  std::set<std::string> years;
+  for(const auto& [country, data]: _db){
+     if(_country_filter.contains(QString::fromStdString(country)))
+      for(const auto& [year, year_data]: data){
+          years.insert(year);
+        }
+    }
+  qDebug() << _years.size() << " and "<< years.size();
+  _catalogue->setYears(QStringListFromSet(years));
+}
+
+void DataManager::applyCountriesFilter(const QStringList &countries) {
+  QStringList stamps;
+  _country_filter = countries;
+  applyYearsFilter({});
+  filterYearsForCountry();
+}
+
+void DataManager::applyYearsFilter(const QStringList &years) {
   QStringList stamps;
   for(const auto& [name, country]: _db)
-    if(filter.contains(QString::fromStdString(name)))
-      for(const auto& year: country)
-        for(const auto& series: year.second){
-          std::transform(series.second.begin(), series.second.end(),
+    if(_country_filter.contains(QString::fromStdString(name)))
+      for(const auto& [year, data]: country)
+        if(years.empty() || years.contains(QString::fromStdString(year)))
+          for(const auto& series: data){
+            std::transform(series.second.begin(), series.second.end(),
                          std::back_inserter(stamps),
                          [](const auto& stamp){
               return "data:image/jpg;base64,"+QString::fromStdString(stamp.image);
-            });
-        }
+              });
+          }
   qDebug() << "Collected "<<stamps.size() <<"stamps";
   _catalogue->setStamps(std::move(stamps));
 }
+
 

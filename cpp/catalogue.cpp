@@ -50,6 +50,7 @@ void Catalogue::applyCountriesFilter(const QStringList &filter)
 void Catalogue::applyYearFilter(const QStringList &filter)
 {
   _yearsFilter = filter;
+  emit sendYearsFilter(_yearsFilter);
 }
 
 void Catalogue::setStamps(QStringList &&stamps)
