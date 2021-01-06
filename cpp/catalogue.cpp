@@ -32,6 +32,18 @@ void Catalogue::setCountries(const QStringList &countries)
   emit countriesChanged();
 }
 
+void Catalogue::setPrices(QStringList &&prices)
+{
+  _prices = std::move(prices);
+  emit pricesChanged();
+}
+
+void Catalogue::setPrices(const QStringList &prices)
+{
+  _prices = prices;
+  emit pricesChanged();
+}
+
 void Catalogue::setCountriesFilter(const QStringList &filter)
 {
   _countriesFilter = filter;
@@ -40,6 +52,11 @@ void Catalogue::setCountriesFilter(const QStringList &filter)
 void Catalogue::setYearsFilter(const QStringList &filter)
 {
   _yearsFilter = filter;
+}
+
+void Catalogue::setPriceFilter(const QStringList &filter)
+{
+  _priceFilter = filter;
 }
 
 void Catalogue::applyCountriesFilter(const QStringList &filter)
@@ -53,6 +70,12 @@ void Catalogue::applyYearFilter(const QStringList &filter)
 {
   _yearsFilter = filter;
   emit sendYearsFilter(_yearsFilter);
+}
+
+void Catalogue::applyPriceFilter(const QStringList &filter)
+{
+  _priceFilter = filter;
+  emit sendPriceFilter(_priceFilter);
 }
 
 void Catalogue::applySort(const QString &sort_type)
@@ -117,6 +140,7 @@ void Catalogue::checkStamp(const Stamp &stamp)
 {
   qDebug() << "stamp "<<stamp._capture<<" "<<stamp._year<<" "
 <<stamp._price;
+  emit stampChanges(stamp);
 }
 
 void Catalogue::setStamps(QVariantList &&stamps)

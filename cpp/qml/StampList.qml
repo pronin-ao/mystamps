@@ -25,12 +25,12 @@ Rectangle {
                     source: modelData.image
                     fillMode: Image.PreserveAspectFit
                     TapHandler {
-                        onLongPressed: {
+                        onDoubleTapped: {
                             showStamp.visible = true;
                             showStamp.stampData = modelData;
                             grid.visible = false;
                         }
-                        onDoubleTapped: {
+                        onLongPressed: {
                             modelData.checked = !modelData.checked;
                             catalogue.checkStamp(modelData);
                         }

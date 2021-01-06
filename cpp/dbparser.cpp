@@ -9,9 +9,18 @@ namespace names {
   const QString kYear = "year";
   const QString kCapture = "capture";
   const QString kStamps = "stamps";
-  const QString kImages = "images";
+  const QString kImage = "image";
+  const QString kPrice = "price";
+  const QString kType = "type";
 
 }
+
+struct Context {
+  std::optional<db::Spec> spec;
+  std::optional<db::CountryName> country;
+};
+
+using namespace std::string_literals;
 
 
 QString GetWithDefault(const QJsonArray& array, size_t index,
@@ -21,45 +30,41 @@ QString GetWithDefault(const QJsonArray& array, size_t index,
   return array[index].toString();
 }
 
-db::Series ParseSeries(const QJsonObject& json, const db::Spec& spec) {
+db::Series ParseSeries(const QJsonObject& json, const Context& context) {
   db::Series res;
   const auto& stamps_it = json.find(names::kStamps);
   if(stamps_it == json.end())
     throw std::runtime_error("Series has no stamps");
-  const auto& images_it = json.find(names::kImages);
-  if(images_it == json.end())
-    throw std::runtime_error("Series has no images");
-  if(!stamps_it->isArray())
-    throw std::runtime_error("Stamps in not an array");
-  if(!images_it->isArray())
-    throw std::runtime_error("Images is not an array");
+  if(!stamps_it->isObject())
+    throw std::runtime_error("Stamps in not an object");
 
-  const auto& stamps = stamps_it->toArray();
-  const auto& images = images_it->toArray();
-  if(images.size() > stamps.size())
-    qWarning() << "We have more images then stamps, some images will be dummy";
-
-  size_t i = 0;
-  res.reserve(images.size());
-  for(const auto& image: images){
-      const auto& stamp = GetWithDefault(stamps, i);
+  const auto& stamps = stamps_it->toObject();
+  res.reserve(stamps.size());
+  for(auto it = stamps.begin(); it != stamps.end(); ++it){
+      const auto& num = it.key().toStdString();
+      const auto& stamp_v = it.value();
+      if(!stamp_v.isObject())
+        throw std::runtime_error("Stamp is not an object");
+      const auto& stamp = stamp_v.toObject();
       db::Stamp new_stamp{
-        i,
-        image.toString().toStdString(),
-        spec,
-        stamp.toStdString(),
-        "###"
+        stamp.value(names::kImage).toString("").toStdString(),
+        context.spec.value_or(""),
+        stamp.value(names::kPrice).toString("").toStdString(),
+        stamp.value(names::kType).toString("").toStdString(),
+        stamp.value(names::kCapture).toString("").toStdString(),
+        db::AddParams{}
       };
-      res.emplace_back(std::move(new_stamp));
-      ++i;
+      res.emplace(num, std::move(new_stamp));
     }
   return res;
 }
 
-db::Country ParseSpec(const QJsonValue& json, const db::Spec& spec){
+db::Country ParseSpec(const QJsonValue& json, const Context& context){
   db::Country res;
   if(!json.isArray())
-    throw std::runtime_error(spec+" of country is not an array");
+    throw std::runtime_error(context.spec.value_or("-")
+                             +" of country "s+
+                             context.country.value_or("-")+" is not an array");
   const auto& series = json.toArray();
   for(const auto& ser: series){
       if(!ser.isObject())
@@ -69,7 +74,7 @@ db::Country ParseSpec(const QJsonValue& json, const db::Spec& spec){
       if(year_it == object.end())
         throw std::runtime_error("Seria has no year");
       const db::YearVal year = year_it->toString().toStdString();
-      const auto& seria = ParseSeries(object, spec);
+      const auto& seria = ParseSeries(object, context);
       const auto& name_it = object.find(names::kCapture);
       if(name_it == object.end())
         throw std::runtime_error("Seria has no name");
@@ -90,14 +95,17 @@ void AppendTo(db::Country& global, const db::Country& spec) {
     }
 }
 
-db::Country ParseCountry(const QJsonValue& json){
+db::Country ParseCountry(const QJsonValue& json, const Context& context){
   db::Country res;
   if(!json.isObject())
-    throw std::runtime_error("Country is not an object");
+    throw std::runtime_error("Country "s+ context.country.value_or("-")
+                             +" is not an object");
   const auto& country = json.toObject();
   for(auto it = country.begin(); it != country.end(); ++it){
       const auto& spec = it.key().toStdString();
-      const auto& part = ParseSpec(*it, spec);
+      auto new_context = context;
+      new_context.spec = spec;
+      const auto& part = ParseSpec(*it, new_context);
       AppendTo(res, part);
     }
   return res;
@@ -112,8 +120,10 @@ db::Catalogue ParseCatalogue(const QString &str)
   db::Catalogue res;
   for(auto it = root.begin(); it != root.end(); ++it){
       qInfo() << "Loading "<<it.key();
+      Context context{};
+      context.country = it.key().toStdString();
       res.emplace(it.key().toStdString(),
-                  ParseCountry(*it));
+                  ParseCountry(*it, context));
     }
 
   return res;

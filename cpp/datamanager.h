@@ -20,19 +20,24 @@ public:
 public slots:
   void applyCountriesFilter(const QStringList& filter);
   void applyYearsFilter(const QStringList& filter);
+  void applyPriceFilter(const QStringList& filter);
 
-  void registerStampChecked(const Stamp& stamp, bool checked);
+  void registerStampChecked(const Stamp& stamp);
 
  private:
   db::Catalogue _db;
 
   void collectAllFilters();
   void filterYearsForCountry();
+  void filterPriceForYears();
 
   std::set<std::string> _countries;
   std::set<std::string> _years;
+  std::set<std::string> _prices;
 
   QStringList _country_filter;
+  QStringList _year_filter;
+  QStringList _price_filter;
 
   Catalogue* _catalogue;
 

@@ -47,6 +47,8 @@ Window{
                 catalogue.applyCountriesFilter(new_filter)
             else if(mainWindow.filterType == "year")
                 catalogue.applyYearFilter(new_filter)
+            else if(mainWindow.filterType == "price")
+                catalogue.applyPriceFilter(new_filter)
         }
 
         onRestore: {
@@ -54,6 +56,8 @@ Window{
                 catalogue.setCountriesFilter(old_filter)
             else if(mainWindow.filterType == "year")
                 catalogue.setYearFilter(old_filter)
+            else if(mainWindow.filterType == "price")
+                catalogue.setPriceFilter(old_filter)
         }
     }
 

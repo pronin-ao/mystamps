@@ -6,17 +6,26 @@
 
 namespace db {
 
+  struct AddParams{
+    bool checked = false;
+  };
+
   using Image = std::string;
   using Spec = std::string;
   using Price = std::string;
+  using Number = std::string;
+  using Code = std::string;
+  using Capture = std::string;
   struct Stamp{
-    size_t index = -1;
     Image image = "";
     Spec spec = "";
     Price price = "";
-    Spec number = "";
+    Code code = "";
+    Capture capture = "";
+
+    AddParams add{};
   };
-  using Series = std::vector<Stamp>;
+  using Series = std::unordered_map<Number, Stamp>;
   using SeriesName = std::string;
   using Year = std::unordered_map<SeriesName, Series>;
   using YearVal = std::string;

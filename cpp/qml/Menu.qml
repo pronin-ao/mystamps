@@ -8,7 +8,7 @@ Rectangle {
     id: menu
     GridLayout{
         anchors.fill: parent
-        columns: Math.max(1,Math.min(3, mainWindow.width / mainWindow.buttonSize))
+        columns: Math.max(1,Math.min(4, mainWindow.width / mainWindow.buttonSize))
         rowSpacing: 2
         columnSpacing: 2
         Button {
@@ -36,6 +36,19 @@ Rectangle {
                 mainWindow.filterType = "year";
             }
         }
+        Button {
+            id: price; Layout.fillWidth: true; Layout.fillHeight: true
+            text: "Prices"
+
+            onClicked: {
+                filter.filterModel = catalogue.prices
+                filter.filtered = catalogue.priceFilter
+                filter.visible = true;
+                content.visible = false;
+                mainWindow.filterType = "price";
+            }
+        }
+
         ColumnLayout{
             Layout.fillWidth: true; Layout.fillHeight: true
             spacing: 1

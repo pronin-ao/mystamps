@@ -64,6 +64,9 @@ class Catalogue : public QObject
   Q_PROPERTY(QVariantList stamps READ stamps NOTIFY stampsUpdated)
   Q_PROPERTY(QString sorting READ sorting NOTIFY sortingChanged)
   Q_PROPERTY(QString order READ order NOTIFY orderChanged)
+  Q_PROPERTY(QStringList priceFilter READ priceFilter WRITE setPriceFilter)
+  Q_PROPERTY(QStringList prices
+             READ prices WRITE setPrices NOTIFY pricesChanged)
 
   QML_ELEMENT
 
@@ -75,11 +78,17 @@ public:
   inline auto countries() const {
     return _countries;
   }
+  inline auto prices() const {
+    return _prices;
+  }
   inline auto yearsFilter() const {
     return _yearsFilter;
   }
   inline auto countriesFilter() const {
     return _countriesFilter;
+  }
+  inline auto priceFilter() const  {
+    return _priceFilter;
   }
   inline auto stamps() const {
     return _stamps;
@@ -99,11 +108,16 @@ public slots:
   void setCountries(QStringList&& countries);
   void setCountries(const QStringList& countries);
 
+  void setPrices(QStringList&& prices);
+  void setPrices(const QStringList& prices);
+
   void setCountriesFilter(const QStringList& filter);
   void setYearsFilter(const QStringList& filter);
+  void setPriceFilter(const QStringList& filter);
 
   void applyCountriesFilter(const QStringList& filter);
   void applyYearFilter(const QStringList& filter);
+  void applyPriceFilter(const QStringList& filter);
 
   void applySort(const QString& sort_type);
   void applyOrder(const QString& sort_order);
@@ -114,21 +128,28 @@ public slots:
 signals:
   void yearsChanged();
   void countriesChanged();
+  void pricesChanged();
+
   void stampsUpdated();
 
   void sendCountriesFilter(const QStringList&);
   void sendYearsFilter(const QStringList&);
+  void sendPriceFilter(const QStringList&);
 
   void dataChanged();
   void sortingChanged();
   void orderChanged();
 
+  void stampChanges(const Stamp&);
+
 private:
   QStringList _years = {};
   QStringList _countries = {};
+  QStringList _prices = {};
 
   QStringList _yearsFilter = {};
   QStringList _countriesFilter = {};
+  QStringList _priceFilter = {};
 
   QVariantList _stamps = {};
 
