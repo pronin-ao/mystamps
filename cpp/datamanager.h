@@ -8,6 +8,7 @@
 #include "catalogue.h"
 
 
+
 class DataManager : public QObject
 {
   Q_OBJECT
@@ -19,6 +20,8 @@ public:
 public slots:
   void applyCountriesFilter(const QStringList& filter);
   void applyYearsFilter(const QStringList& filter);
+
+  void registerStampChecked(const Stamp& stamp, bool checked);
 
  private:
   db::Catalogue _db;

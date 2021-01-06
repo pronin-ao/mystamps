@@ -94,11 +94,11 @@ void Catalogue::applySort(const QString &sort_type)
     return;
 
   _sorting = sort_type;
-  const auto& compare = (_order == order::kRise)
+  const auto& compare = (_order == order::kRaise)
       ? sorting[sort_type]
-        : [sort_type](const QVariant& v1, const QVariant& v2){
+        : ([sort_type](const QVariant& v1, const QVariant& v2){
       return !sorting[sort_type](v1,v2);
-    };
+    });
   std::sort(_stamps.begin(), _stamps.end(), compare);
   emit stampsUpdated();
   emit sortingChanged();
@@ -106,13 +106,18 @@ void Catalogue::applySort(const QString &sort_type)
 
 void Catalogue::applyOrder(const QString &sort_order)
 {
-  if(sort_order != order::kRise && sort_order != order::kFall)
+  if(sort_order != order::kRaise && sort_order != order::kFall)
     return;
   _order = sort_order;
   applySort(_sorting);
   emit orderChanged();
 }
 
+void Catalogue::checkStamp(const Stamp &stamp)
+{
+  qDebug() << "stamp "<<stamp._capture<<" "<<stamp._year<<" "
+<<stamp._price;
+}
 
 void Catalogue::setStamps(QVariantList &&stamps)
 {

@@ -47,7 +47,7 @@ namespace sorting {
   const QString kSeries = "series";
 }
 namespace order {
-  const QString kRise = "rise";
+  const QString kRaise = "raise";
   const QString kFall = "fall";
 
 }
@@ -108,6 +108,8 @@ public slots:
   void applySort(const QString& sort_type);
   void applyOrder(const QString& sort_order);
 
+  void checkStamp(const Stamp& stamp);
+
 
 signals:
   void yearsChanged();
@@ -131,6 +133,6 @@ private:
   QVariantList _stamps = {};
 
   QString _sorting = sorting::kYear;
-  QString _order= order::kRise;
+  QString _order= order::kRaise;
 };
 

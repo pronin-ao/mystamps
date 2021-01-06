@@ -4,14 +4,16 @@
 
 #include <QDebug>
 
+
 #include "dbparser.h"
 
-const QString Filename = ":/db/stamps";
+const QString dbFilename = ":/db/stamps";
+const QString Datafile = "mystamps-data.json";
 
-QString ReadFile(){
+QString ReadFile(const QString& filename){
   QString val;
   QFile file;
-  file.setFileName(Filename);
+  file.setFileName(filename);
   file.open(QIODevice::ReadOnly | QIODevice::Text);
   val = file.readAll();
   file.close();
@@ -32,9 +34,18 @@ QStringList QStringListFromSet(const std::set<std::string>& set) {
 
 DataManager::DataManager(QObject *parent) : QObject(parent)
 {
-  const auto& json = ReadFile();
+  const auto& json = ReadFile(dbFilename);
   _db = ParseCatalogue(json);
   collectAllFilters();
+  const auto& str = ReadFile(Datafile);
+  qDebug() << "read "<<str;
+  {
+    QFile file;
+    file.setFileName(Datafile);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    file.write("[]");
+    file.close();
+  }
 }
 
 void DataManager::setCatalogue(Catalogue *catalogue)

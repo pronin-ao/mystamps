@@ -32,6 +32,7 @@ Rectangle {
                         }
                         onDoubleTapped: {
                             modelData.checked = !modelData.checked;
+                            catalogue.checkStamp(modelData);
                         }
                     }
 
