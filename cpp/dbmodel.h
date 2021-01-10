@@ -16,12 +16,14 @@ namespace db {
   using Number = std::string;
   using Code = std::string;
   using Capture = std::string;
+  using Color = std::string;
   struct Stamp{
     Image image = "";
     Spec spec = "";
     Price price = "";
     Code code = "";
     Capture capture = "";
+    Color color = "";
 
     AddParams add{};
   };

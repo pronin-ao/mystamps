@@ -12,6 +12,7 @@ namespace names {
   const QString kImage = "image";
   const QString kPrice = "price";
   const QString kType = "type";
+  const QString kColor = "color";
 
 }
 
@@ -52,6 +53,7 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
         stamp.value(names::kPrice).toString("").toStdString(),
         stamp.value(names::kType).toString("").toStdString(),
         stamp.value(names::kCapture).toString("").toStdString(),
+        stamp.value(names::kColor).toString("").toStdString(),
         db::AddParams{}
       };
       res.emplace(num, std::move(new_stamp));

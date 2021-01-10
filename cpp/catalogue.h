@@ -9,35 +9,41 @@ class Stamp {
   Q_PROPERTY(QString capture READ capture)
   Q_PROPERTY(QString image READ image)
   Q_PROPERTY(QString price READ price)
-  Q_PROPERTY(size_t index READ index)
   Q_PROPERTY(QString year READ year)
   Q_PROPERTY(QString country READ country)
   Q_PROPERTY(QString spec READ spec)
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
   Q_PROPERTY(QString id READ id)
+  Q_PROPERTY(QString code READ code)
+  Q_PROPERTY(QString color READ color)
+  Q_PROPERTY(QString series READ series)
 
 public:
   inline auto capture() const {return _capture;}
   inline auto image() const {return _image;}
   inline auto price() const {return _price;}
-  inline auto index() const {return _index;}
   inline auto year() const {return _year;}
   inline auto country() const {return _country;}
   inline auto spec() const {return _spec;}
   inline auto checked() const {return _checked;}
   inline auto id() const {return _id;}
+  inline auto code() const {return _code;}
+  inline auto color() const {return _color;}
+  inline auto series() const {return _series;}
 
   void setChecked(const bool checked);
 
   QString _capture;
   QString _image;
   QString _price;
-  size_t _index;
   QString _year;
   QString _country;
   QString _spec;
   bool _checked = false;
   QString _id;
+  QString _code;
+  QString _color;
+  QString _series;
 };
 
 namespace sorting {

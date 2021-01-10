@@ -175,15 +175,17 @@ void DataManager::applyPriceFilter(const QStringList &filter)
                   QVariant var;
                 var.setValue(
                       Stamp{
-                        QString::fromStdString(cap),
+                        QString::fromStdString(stamp.second.capture),
                         "data:image/jpg;base64,"+QString::fromStdString(stamp.second.image),
                         QString::fromStdString(stamp.second.price),
-                        0,// index must be number
                         QString::fromStdString(year),
                         QString::fromStdString(name),
                         QString::fromStdString(stamp.second.spec),
                         stamp.second.add.checked,
-                        QString::fromStdString(stamp.second.code)
+                        QString::fromStdString(stamp.first),
+                        QString::fromStdString(stamp.second.code),
+                        QString::fromStdString(stamp.second.color),
+                        QString::fromStdString(cap)
                       });
                 return var;
                 });

@@ -13,7 +13,7 @@ Rectangle{
         height: parent.height / 10
         text: {
             parent.stampData.country + ", \t" + parent.stampData.year +
-                    ": \t" + parent.stampData.capture +
+                    ": \t" + parent.stampData.series +
                     ((parent.stampData.spec === "default")?"" : ("\t\t(" +
                     parent.stampData.spec + ")"));
         }
@@ -35,7 +35,12 @@ Rectangle{
         anchors.bottom: parent.bottom
         width: parent.width
         height: parent.height / 10
-        text: "id: " + parent.stampData.id +"\t price: "+parent.stampData.price
+        text: {
+            "id: " + parent.stampData.id + ":" + parent.stampData.code +
+                    " \t\t price: "+parent.stampData.price +
+                    "\t " + parent.stampData.capture + "\t "+
+                    "color: " + parent.stampData.color
+        }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }

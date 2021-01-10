@@ -89,9 +89,9 @@ void Catalogue::applySort(const QString &sort_type)
   static const auto& series_cmp = [](const QVariant& v1, const QVariant& v2){
       const auto& s1 = v1.value<Stamp>();
       const auto& s2 = v2.value<Stamp>();
-      if(s1.capture() == s2.capture())
+      if(s1.series() == s2.series())
         return price_cmp(v1, v2);
-      return s1.capture().toLower() < s2.capture().toLower();
+      return s1.series().toLower() < s2.series().toLower();
     };
   static const auto& year_cmp = [](const QVariant& v1, const QVariant& v2){
       const auto& s1 = v1.value<Stamp>();
