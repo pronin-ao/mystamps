@@ -36,10 +36,11 @@ FULL_COUNTRIES = [
     'Nui',
     'Nukufetau',
     'Nevis',
+    'Isle-of-Man',
 ]
 
 if TEST:
-    COUNTRIES = ['Belgium']
+    COUNTRIES = ['Isle-of-Man']
 else:
     COUNTRIES = FULL_COUNTRIES
 
@@ -56,9 +57,10 @@ MAIN = '&cid=164812'
 # main view=mycatalogue&cid=164812&user=383347
 
 SERIES_PATH = '/html/body/div[1]/div/div[2]/div/div[1]/div/div[4]/div'
-PRICE_PATH = 'div[3]/table/tbody/tr/td[2]/text()'
 NUMBER_PATH = 'div[3]/table/tbody/tr/th/a/text()'
 TYPE_PATH = 'div[3]/table/tbody/tr/td[1]/a'
+PRICE_PATH = 'div[3]/table/tbody/tr/td[2]/text()'
+COLOR_PATH = 'div[3]/table/tbody/tr/td[4]/text()'
 CAPTURE_PATH = 'div[3]/table/tbody/tr/td[6]/text()'
 SERIES_TOP = 'div[1]/div/a/text()'
 
@@ -117,6 +119,9 @@ def parse_response(tree):
         captures = part.xpath(CAPTURE_PATH)
         str_caps = [clrstr(str(cap)) for cap in captures]
 
+        colors = part.xpath(COLOR_PATH)
+        str_colors = [clrstr(str(col)) for col in colors]
+
         types = part.xpath(TYPE_PATH)
         str_types = [
             clrstr(str(typ.xpath('text()')).replace('[', '').replace(']', '')
@@ -138,9 +143,12 @@ def parse_response(tree):
         assert len(str_numbers) == len(str_prices)
         assert len(str_numbers) == len(str_caps)
         assert len(str_numbers) == len(str_types)
+        assert len(str_numbers) == len(str_colors)
 
         stamps = {}
-        for num, typ, price, cap in zip(str_numbers, str_types, str_prices, str_caps):
+        for num, typ, price, cap, color in zip(
+                str_numbers, str_types, str_prices, str_caps, str_colors
+        ):
             if TEST:
                 print('# {}, type {}, price {}'.format(num, typ, price))
             if '‑' not in num and num not in stamps:
@@ -150,6 +158,7 @@ def parse_response(tree):
                     'type': typ,
                     'price': price,
                     'capture': cap,
+                    'color': color
                 }
                 if typ in images_map:
                     stamp['image'] = images_map[typ]
