@@ -1,7 +1,4 @@
 <RCC>
-    <qresource prefix="/db">
-        <file alias="stamps">res/stamp_base.json</file>
-    </qresource>
     <qresource prefix="/">
         <file>main.qml</file>
         <file>qml/Filter.qml</file>

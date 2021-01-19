@@ -7,13 +7,21 @@
 
 #include "dbparser.h"
 
-const QString dbFilename = ":/db/stamps";
-const QString Datafile = "mystamps-data.json";
+#if defined(Q_OS_ANDROID)
+const QString dbFilename = "/sdcard/stamps/stamp_base.json";
+const QString Datafile = "/sdcard/stamps/mystamps-data.json";
+#elif defined(Q_OS_LINUX)
+const QString dbFilename = "../cpp/res/stamp_base.json";
+const QString Datafile = "../cpp/res/mystamps-data.json";
+#endif
+
+
 
 QString ReadFile(const QString& filename){
   QString val;
   QFile file;
   file.setFileName(filename);
+  qDebug() << "Reading "<<filename;
   file.open(QIODevice::ReadOnly | QIODevice::Text);
   val = file.readAll();
   file.close();
@@ -37,15 +45,8 @@ DataManager::DataManager(QObject *parent) : QObject(parent)
   const auto& json = ReadFile(dbFilename);
   _db = ParseCatalogue(json);
   collectAllFilters();
-  const auto& str = ReadFile(Datafile);
-  qDebug() << "read "<<str;
-  {
-    QFile file;
-    file.setFileName(Datafile);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    file.write("[]");
-    file.close();
-  }
+  const auto& add_json = ReadFile(Datafile);
+  ParseAddData(add_json, _db);
 }
 
 void DataManager::setCatalogue(Catalogue *catalogue)
@@ -130,6 +131,16 @@ void DataManager::filterPriceForYears()
   _catalogue->setPrices(QStringListFromSet(prices));
 }
 
+void DataManager::saveAddToFile()
+{
+  const auto& new_data = SerializeAddData(_db);
+  QFile file;
+  file.setFileName(Datafile);
+  file.open(QIODevice::WriteOnly | QIODevice::Text);
+  file.write(new_data.toUtf8());
+  file.close();
+}
+
 void DataManager::applyCountriesFilter(const QStringList &countries) {
   QStringList stamps;
   _country_filter = countries;
@@ -176,7 +187,7 @@ void DataManager::applyPriceFilter(const QStringList &filter)
                 var.setValue(
                       Stamp{
                         QString::fromStdString(stamp.second.capture),
-                        "data:image/jpg;base64,"+QString::fromStdString(stamp.second.image),
+                        QString::fromStdString(stamp.second.image),
                         QString::fromStdString(stamp.second.price),
                         QString::fromStdString(year),
                         QString::fromStdString(name),
@@ -197,10 +208,11 @@ void DataManager::applyPriceFilter(const QStringList &filter)
   _catalogue->setStamps(std::move(stamps));
 }
 
-void DataManager::registerStampChecked(const Stamp &)
+void DataManager::registerStampChecked(const Stamp &st)
 {
-  /*_db[st._country.toStdString()][st._year.toStdString()][st._capture.toStdString()]
-      [st._index].checked = st._checked;*/
+  _db[st._country.toStdString()][st._year.toStdString()][st._series.toStdString()]
+      [st._id.toStdString()].add.checked = st._checked;
+  saveAddToFile();
 }
 
 

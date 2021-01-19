@@ -31,6 +31,8 @@ public slots:
   void filterYearsForCountry();
   void filterPriceForYears();
 
+  void saveAddToFile();
+
   std::set<std::string> _countries;
   std::set<std::string> _years;
   std::set<std::string> _prices;

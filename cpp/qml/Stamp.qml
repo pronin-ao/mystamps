@@ -23,11 +23,27 @@ Rectangle{
     }
     Image {
         id: stamp
-        source: parent.stampData.image
+        source: {
+            (showStamp.stampData.image === "") ? "" :
+            "data:image/jpg;base64,"+showStamp.stampData.image
+        }
         anchors.top: topText.bottom
         anchors.bottom: bottomText.top
         width: parent.width
         fillMode: Image.PreserveAspectFit
+        Text{
+            visible: {parent.source == ""}
+            anchors.fill: parent
+            text: {
+                 showStamp.stampData.country + ", \t" +
+                 showStamp.stampData.year + "\n" +
+                 showStamp.stampData.color + ", \t" +
+                 showStamp.stampData.price
+            }
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            color: "#cccccc"
+        }
     }
     Text{
         id: bottomText

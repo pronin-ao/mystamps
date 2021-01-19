@@ -22,7 +22,10 @@ Rectangle {
                 Image{
                     anchors.fill: parent
                     id: image
-                    source: modelData.image
+                    source: {
+                        (modelData.image === "") ? "" :
+                        "data:image/jpg;base64,"+modelData.image
+                    }
                     fillMode: Image.PreserveAspectFit
                     TapHandler {
                         onDoubleTapped: {
@@ -40,6 +43,19 @@ Rectangle {
                         anchors.fill: parent
                         visible: modelData.checked
                         color: "#5088cc88"
+                    }
+                    Text{
+                        visible: {parent.source == ""}
+                        anchors.fill: parent
+                        color: "#cccccc"
+                        text: {
+                             modelData.country + ",   " +
+                             modelData.year + "\n" +
+                             modelData.color + ",   " +
+                             modelData.price
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
             }

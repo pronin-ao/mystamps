@@ -138,8 +138,6 @@ void Catalogue::applyOrder(const QString &sort_order)
 
 void Catalogue::checkStamp(const Stamp &stamp)
 {
-  qDebug() << "stamp "<<stamp._capture<<" "<<stamp._year<<" "
-<<stamp._price;
   emit stampChanges(stamp);
 }
 

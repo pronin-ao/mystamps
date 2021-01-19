@@ -6,6 +6,9 @@
 #include <QJsonValue>
 
 namespace names {
+  const QString kCountry = "country";
+  const QString kSeries = "series";
+  const QString kId = "id";
   const QString kYear = "year";
   const QString kCapture = "capture";
   const QString kStamps = "stamps";
@@ -13,6 +16,8 @@ namespace names {
   const QString kPrice = "price";
   const QString kType = "type";
   const QString kColor = "color";
+
+  const QString kChecked = "checked";
 
 }
 
@@ -76,14 +81,19 @@ db::Country ParseSpec(const QJsonValue& json, const Context& context){
       if(year_it == object.end())
         throw std::runtime_error("Seria has no year");
       const db::YearVal year = year_it->toString().toStdString();
-      const auto& seria = ParseSeries(object, context);
+      auto seria = ParseSeries(object, context);
       const auto& name_it = object.find(names::kCapture);
       if(name_it == object.end())
         throw std::runtime_error("Seria has no name");
       const db::SeriesName& name = name_it->toString().toStdString();
       if(!res.count(year))
         res[year] = {};
-      res[year].emplace(name, seria);
+      if(!res[year].count(name))
+        res[year].emplace(name, seria);
+      else {
+          qDebug() << "Seria "<< name_it->toString() << " duplicated";
+        res[year][name].merge(seria);
+      }
     }
   return res;
 }
@@ -129,4 +139,48 @@ db::Catalogue ParseCatalogue(const QString &str)
     }
 
   return res;
+}
+///////////////////////////////////////////////////////////////////////////////
+QJsonDocument AddParamsToJson(const db::Catalogue& db){
+  QJsonArray res;
+  for(const auto& [country, country_data]: db)
+    for(const auto& [year, year_data]: country_data)
+      for(const auto& [series, series_data]: year_data)
+        for(const auto& [id, stamp_data]: series_data){
+            QJsonObject stamp;
+            stamp[names::kCountry] = QString::fromStdString(country);
+            stamp[names::kYear] = QString::fromStdString(year);
+            stamp[names::kSeries] = QString::fromStdString(series);
+            stamp[names::kId] = QString::fromStdString(id);
+            stamp[names::kChecked] = stamp_data.add.checked;
+            res.append(stamp);
+          }
+  return QJsonDocument(res);
+}
+
+
+QString SerializeAddData(const db::Catalogue &db)
+{
+  const auto& json = AddParamsToJson(db);
+  return QString::fromUtf8(json.toJson());
+}
+
+void ParseAddData(const QString& str, db::Catalogue& db){
+  QJsonDocument json = QJsonDocument::fromJson(str.toUtf8());
+  if(!json.isArray())
+    throw std::runtime_error{"Global add data value is not an array"};
+  const auto& array = json.array();
+  for(const auto& stamp: array){
+      try{
+        const auto& country = stamp[names::kCountry].toString().toStdString();
+        const auto& year = stamp[names::kYear].toString().toStdString();
+        const auto& series = stamp[names::kSeries].toString().toStdString();
+        const auto& id = stamp[names::kId].toString().toStdString();
+        db[country][year][series][id].add = db::AddParams{
+            stamp[names::kChecked].toBool()
+      };
+      } catch(const std::out_of_range& err){
+        qDebug() << "Skipping a stamp "<<stamp;
+      }
+    }
 }
