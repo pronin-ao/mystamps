@@ -17,6 +17,8 @@ class Stamp {
   Q_PROPERTY(QString code READ code)
   Q_PROPERTY(QString color READ color)
   Q_PROPERTY(QString series READ series)
+  Q_PROPERTY(bool owned READ owned)
+  Q_PROPERTY(QStringList conditions READ conditions)
 
 public:
   inline auto capture() const {return _capture;}
@@ -30,6 +32,8 @@ public:
   inline auto code() const {return _code;}
   inline auto color() const {return _color;}
   inline auto series() const {return _series;}
+  inline auto owned() const {return _owned;}
+  inline auto conditions() const {return _conditions;}
 
   void setChecked(const bool checked);
 
@@ -44,6 +48,8 @@ public:
   QString _code;
   QString _color;
   QString _series;
+  bool _owned;
+  QStringList _conditions;
 };
 
 namespace sorting {
@@ -56,6 +62,12 @@ namespace order {
   const QString kRaise = "raise";
   const QString kFall = "fall";
 
+}
+
+namespace show {
+  const QString kAll = "all";
+  const QString kOwned = "owned";
+  const QString kWishlist = "wishlist";
 }
 
 
@@ -73,6 +85,7 @@ class Catalogue : public QObject
   Q_PROPERTY(QStringList priceFilter READ priceFilter WRITE setPriceFilter)
   Q_PROPERTY(QStringList prices
              READ prices WRITE setPrices NOTIFY pricesChanged)
+  Q_PROPERTY(QString showMode READ showMode WRITE applyShowMode)
 
   QML_ELEMENT
 
@@ -95,6 +108,9 @@ public:
   }
   inline auto priceFilter() const  {
     return _priceFilter;
+  }
+  inline auto showMode() const  {
+    return _showMode;
   }
   inline auto stamps() const {
     return _stamps;
@@ -124,6 +140,7 @@ public slots:
   void applyCountriesFilter(const QStringList& filter);
   void applyYearFilter(const QStringList& filter);
   void applyPriceFilter(const QStringList& filter);
+  void applyShowMode(const QString& showMode);
 
   void applySort(const QString& sort_type);
   void applyOrder(const QString& sort_order);
@@ -141,6 +158,7 @@ signals:
   void sendCountriesFilter(const QStringList&);
   void sendYearsFilter(const QStringList&);
   void sendPriceFilter(const QStringList&);
+  void sendShowMode(const QString&);
 
   void dataChanged();
   void sortingChanged();
@@ -156,6 +174,7 @@ private:
   QStringList _yearsFilter = {};
   QStringList _countriesFilter = {};
   QStringList _priceFilter = {};
+  QString _showMode = show::kAll;
 
   QVariantList _stamps = {};
 

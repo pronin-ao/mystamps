@@ -78,6 +78,14 @@ void Catalogue::applyPriceFilter(const QStringList &filter)
   emit sendPriceFilter(_priceFilter);
 }
 
+void Catalogue::applyShowMode(const QString &showMode)
+{
+  if(showMode != show::kAll && showMode != show::kOwned && showMode != show::kWishlist)
+    return;
+  _showMode = showMode;
+  emit sendShowMode(showMode);
+}
+
 void Catalogue::applySort(const QString &sort_type)
 {
   static const auto& price_cmp = [](const QVariant& v1, const QVariant& v2){

@@ -21,6 +21,7 @@ public slots:
   void applyCountriesFilter(const QStringList& filter);
   void applyYearsFilter(const QStringList& filter);
   void applyPriceFilter(const QStringList& filter);
+  void applyShowMode(const QString& showMode);
 
   void registerStampChecked(const Stamp& stamp);
 
@@ -40,6 +41,7 @@ public slots:
   QStringList _country_filter;
   QStringList _year_filter;
   QStringList _price_filter;
+  QString _showMode = show::kAll;
 
   Catalogue* _catalogue;
 

@@ -16,7 +16,11 @@ Rectangle {
         Component{
             id: stampDelegate
             Rectangle{
-                color: modelData.checked ? "green" : "#00000000"
+                color: {
+                    modelData.checked
+                            ? "green"
+                            : (modelData.owned ? "#333355" : "#00000000")
+                }
                 width: content.width / 2
                 height: content.height / 4
                 Image{
@@ -56,6 +60,22 @@ Rectangle {
                         }
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
+                    }
+                }
+                Text{
+                    anchors.fill: parent
+                    visible: modelData.owned
+                    color: "#bb3300"
+                    font.bold: true
+                    text: {
+                        ((modelData.conditions.indexOf("mnh")>=0)
+                         ? "**\n" : "") +
+                        ((modelData.conditions.indexOf("mint")>=0)
+                         ? "*\n": "") +
+                        ((modelData.conditions.indexOf("used")>=0)
+                         ?"#\n":"") +
+                        ((modelData.conditions.indexOf("fdc")>=0)
+                         ?"[fdc]":"")
                     }
                 }
             }

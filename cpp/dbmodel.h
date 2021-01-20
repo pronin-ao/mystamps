@@ -17,6 +17,7 @@ namespace db {
   using Code = std::string;
   using Capture = std::string;
   using Color = std::string;
+  using Conditions = std::vector<std::string>;
   struct Stamp{
     Image image = "";
     Spec spec = "";
@@ -24,6 +25,9 @@ namespace db {
     Code code = "";
     Capture capture = "";
     Color color = "";
+    bool owned = false;
+    Conditions condition{};
+
 
     AddParams add{};
   };

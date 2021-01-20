@@ -16,6 +16,8 @@ namespace names {
   const QString kPrice = "price";
   const QString kType = "type";
   const QString kColor = "color";
+  const QString kOwned = "owned";
+  const QString kCond = "cond";
 
   const QString kChecked = "checked";
 
@@ -52,6 +54,13 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
       if(!stamp_v.isObject())
         throw std::runtime_error("Stamp is not an object");
       const auto& stamp = stamp_v.toObject();
+      const auto& cond_json = stamp.value(names::kCond).toArray({});
+      db::Conditions cond{};
+      cond.reserve(cond_json.size());
+      std::transform(cond_json.begin(), cond_json.end(),
+                     std::back_inserter(cond),[](const auto& val){
+          return val.toString().toStdString();
+        });
       db::Stamp new_stamp{
         stamp.value(names::kImage).toString("").toStdString(),
         context.spec.value_or(""),
@@ -59,6 +68,8 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
         stamp.value(names::kType).toString("").toStdString(),
         stamp.value(names::kCapture).toString("").toStdString(),
         stamp.value(names::kColor).toString("").toStdString(),
+        stamp.value(names::kOwned).toBool(false),
+        std::move(cond),
         db::AddParams{}
       };
       res.emplace(num, std::move(new_stamp));
@@ -176,11 +187,11 @@ void ParseAddData(const QString& str, db::Catalogue& db){
         const auto& year = stamp[names::kYear].toString().toStdString();
         const auto& series = stamp[names::kSeries].toString().toStdString();
         const auto& id = stamp[names::kId].toString().toStdString();
-        db[country][year][series][id].add = db::AddParams{
+        db.at(country).at(year).at(series).at(id).add = db::AddParams{
             stamp[names::kChecked].toBool()
-      };
+        };
       } catch(const std::out_of_range& err){
-        qDebug() << "Skipping a stamp "<<stamp;
+        // qDebug() << "Skipping a stamp "<<stamp;
       }
     }
 }

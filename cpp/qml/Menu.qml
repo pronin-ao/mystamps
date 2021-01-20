@@ -36,18 +36,38 @@ Rectangle {
                 mainWindow.filterType = "year";
             }
         }
-        Button {
-            id: price; Layout.fillWidth: true; Layout.fillHeight: true
-            text: "Prices"
+        ColumnLayout{
+            Layout.fillWidth: true; Layout.fillHeight: true
+            spacing: 1
+            Button {
+                height: parent.height / 2
+                width: parent.width
+                id: price; Layout.fillWidth: true; Layout.fillHeight: true
+                text: "Prices"
 
-            onClicked: {
-                filter.filterModel = catalogue.prices
-                filter.filtered = catalogue.priceFilter
-                filter.visible = true;
-                content.visible = false;
-                mainWindow.filterType = "price";
+                onClicked: {
+                    filter.filterModel = catalogue.prices
+                    filter.filtered = catalogue.priceFilter
+                    filter.visible = true;
+                    content.visible = false;
+                    mainWindow.filterType = "price";
+                }
+            }
+            ComboBox {
+                Layout.fillWidth: true; Layout.fillHeight: true
+                id: wishOwned;
+                height: parent.height / 2
+                width: parent.width
+                displayText: "Show "+currentText
+                model: ["all", "owned", "wishlist"]
+                currentIndex: 0
+
+                onCurrentTextChanged: {
+                    catalogue.showMode = currentText
+                }
             }
         }
+
 
         ColumnLayout{
             Layout.fillWidth: true; Layout.fillHeight: true

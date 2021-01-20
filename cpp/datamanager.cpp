@@ -60,6 +60,8 @@ void DataManager::setCatalogue(Catalogue *catalogue)
           this, &DataManager::applyPriceFilter);
   connect(catalogue, &Catalogue::stampChanges,
           this, &DataManager::registerStampChecked);
+  connect(catalogue, &Catalogue::sendShowMode,
+          this, &DataManager::applyShowMode);
 
   auto countries = QStringListFromSet(_countries);
   catalogue->setCountriesFilter(countries);
@@ -173,17 +175,29 @@ void DataManager::applyPriceFilter(const QStringList &filter)
               std::copy_if(series.second.begin(), series.second.end(),
                            std::inserter(filtered, filtered.begin()),
                            [&prices = this->_price_filter,
-                           &all_prices = this->_prices](const auto& stamp){
+                           &all_prices = this->_prices,
+                           &showMode=this->_showMode]
+                           (const auto& stamp){
                   if(prices.empty() ||
                      static_cast<size_t>(prices.size()) == all_prices.size() ||
                      prices.contains(QString::fromStdString(stamp.second.price)))
-                    return true;
+                    {
+                      if(showMode == show::kAll ||
+                         (showMode == show::kOwned && stamp.second.owned) ||
+                         (showMode == show::kWishlist && !stamp.second.owned))
+                      return true;
+                    }
                   return false;
                 });
               std::transform(filtered.begin(), filtered.end(),
                            std::back_inserter(stamps),
                            [&cap=series.first, &year, &name=country_name](const auto& stamp){
                   QVariant var;
+                  QStringList conds{};
+                  conds.reserve(stamp.second.condition.size());
+                  std::transform(stamp.second.condition.begin(), stamp.second.condition.end(),
+                                 std::back_inserter(conds),
+                                 [](const auto& str){return QString::fromStdString(str);});
                 var.setValue(
                       Stamp{
                         QString::fromStdString(stamp.second.capture),
@@ -196,7 +210,8 @@ void DataManager::applyPriceFilter(const QStringList &filter)
                         QString::fromStdString(stamp.first),
                         QString::fromStdString(stamp.second.code),
                         QString::fromStdString(stamp.second.color),
-                        QString::fromStdString(cap)
+                        QString::fromStdString(cap),
+                        stamp.second.owned,std::move(conds)
                       });
                 return var;
                 });
@@ -206,6 +221,12 @@ void DataManager::applyPriceFilter(const QStringList &filter)
   }
   qDebug() << "Collected "<<stamps.size() <<"stamps";
   _catalogue->setStamps(std::move(stamps));
+}
+
+void DataManager::applyShowMode(const QString &showMode)
+{
+  _showMode = showMode;
+  applyPriceFilter(_price_filter);
 }
 
 void DataManager::registerStampChecked(const Stamp &st)

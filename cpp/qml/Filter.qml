@@ -1,6 +1,7 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+
 
 Rectangle{
     id: root
@@ -40,6 +41,10 @@ Rectangle{
                         var ind = filtered.indexOf(modelData);
                         filtered.splice(ind, 1);
                     }
+                }
+                background: Rectangle {
+                    visible: true
+                    color: checked ? "#00000000": "#3300ff00"
                 }
             }
         }
