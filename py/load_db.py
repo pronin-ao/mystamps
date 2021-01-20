@@ -7,20 +7,13 @@ import urllib.request as ur
 
 TEST = False
 
-SHORT_TEST_COUNTRIES = [
-    'Russia',
-]
-
-BIG_TEST_COUNTRIES = [
-    'Belgium'
-]
 
 FULL_COUNTRIES = [
+    'USSR',
     'Belgium',
     'Austria',
     'Poland',
     'Russia',
-    'USSR',
     'St.-Lucia',
     'Union-Island',
     'St.-Vincent-And-The-Grenadines',
@@ -40,7 +33,7 @@ FULL_COUNTRIES = [
 ]
 
 if TEST:
-    COUNTRIES = ['Isle-of-Man']
+    COUNTRIES = ['USSR']
 else:
     COUNTRIES = FULL_COUNTRIES
 
@@ -53,8 +46,6 @@ CATEGORIES = [
 URL = 'https://www.stampworld.com'
 LINK = URL + '/ru/stamps/COUNTRY/?view=wanted&user=383347'
 MAIN = '&cid=164812'
-# wanted view=wanted&user=383347&cid=164812
-# main view=mycatalogue&cid=164812&user=383347
 
 SERIES_PATH = '/html/body/div[1]/div/div[2]/div/div[1]/div/div[4]/div'
 NUMBER_PATH = 'div[3]/table/tbody/tr/th/a/text()'
@@ -62,9 +53,14 @@ TYPE_PATH = 'div[3]/table/tbody/tr/td[1]/a'
 PRICE_PATH = 'div[3]/table/tbody/tr/td[2]/text()'
 COLOR_PATH = 'div[3]/table/tbody/tr/td[4]/text()'
 CAPTURE_PATH = 'div[3]/table/tbody/tr/td[6]/text()'
+GET_IMAGE = 'img/@src'
+MINT_NEVER_HINGED_PATH = 'div[3]/table/tbody/tr/td[9]'
+MINT_PATH = 'div[3]/table/tbody/tr/td[10]'
+USED_PATH = 'div[3]/table/tbody/tr/td[11]'
+FDC_PATH = 'div[3]/table/tbody/tr/td[12]'
 SERIES_TOP = 'div[1]/div/a/text()'
 
-IMAGES_PATH = 'div[2]/div/span/img/@src'
+IMAGES_PATH = 'div[2]/div/span/' + GET_IMAGE
 IMAGES_LINKS = 'div[2]/div/span'
 TYPE_TAG = 'data-stamp-type'
 
@@ -86,7 +82,12 @@ def get_category(pre_link, name):
         suffix = '&category_name=' + name
     print('>>\t', (name if name else 'default').replace('+', ' '), ' >> ')
     link = pre_link + suffix
-    return request_and_parse(link)
+    print('>>wishlist')
+    res = request_and_parse(link)
+    print('>>ownlist')
+    res += request_and_parse(link + MAIN, my=True)
+    return res
+
 
 
 def clrstr(string):
@@ -96,10 +97,11 @@ def clrstr(string):
 ENCODING = 'utf-8'
 
 
-def parse_response(tree):
+def parse_response(tree, my):
     series = tree.xpath(SERIES_PATH)
     series_map = []
-    for part in series:
+    for i, part in enumerate(series):
+        print('\rseries {} of {}'.format(i+1, len(series)), end="\r")
         top = part.xpath(SERIES_TOP)
         tops = str(top).replace('  ', '').split('\\n')
         if len(tops) < 4:
@@ -129,6 +131,11 @@ def parse_response(tree):
             for typ in types
         ]
 
+        mnhs = part.xpath(MINT_NEVER_HINGED_PATH)
+        mints = part.xpath(MINT_PATH)
+        useds = part.xpath(USED_PATH)
+        fdcs = part.xpath(FDC_PATH)
+
         images = part.xpath(IMAGES_PATH)
         images_map = {}
         for image in images:
@@ -145,9 +152,15 @@ def parse_response(tree):
         assert len(str_numbers) == len(str_types)
         assert len(str_numbers) == len(str_colors)
 
+        assert len(str_numbers) == len(mnhs)
+        assert len(str_numbers) == len(mints)
+        assert len(str_numbers) == len(useds)
+        assert len(str_numbers) == len(fdcs)
+
         stamps = {}
-        for num, typ, price, cap, color in zip(
-                str_numbers, str_types, str_prices, str_caps, str_colors
+        for num, typ, price, cap, color, mnh, mint, used, fdc in zip(
+                str_numbers, str_types, str_prices, str_caps, str_colors,
+                mnhs, mints, useds, fdcs
         ):
             if TEST:
                 print('# {}, type {}, price {}'.format(num, typ, price))
@@ -158,8 +171,20 @@ def parse_response(tree):
                     'type': typ,
                     'price': price,
                     'capture': cap,
-                    'color': color
+                    'color': color,
+                    'owned': my,
                 }
+                if my:
+                    stamp['cond'] = []
+                    if len(str(mnh.xpath(GET_IMAGE))) > 2:
+                        # print(len(str(mnh.xpath(GET_IMAGE))))
+                        stamp['cond'].append('mnh')
+                    if len(str(mint.xpath(GET_IMAGE))) > 2:
+                        stamp['cond'].append('mint')
+                    if len(str(used.xpath(GET_IMAGE))) > 2:
+                        stamp['cond'].append('used')
+                    if len(str(fdc.xpath(GET_IMAGE))) > 2:
+                        stamp['cond'].append('fdc')
                 if typ in images_map:
                     stamp['image'] = images_map[typ]
                 elif len(images_map) == 1:
@@ -191,27 +216,34 @@ def parse_response(tree):
 
         seria['stamps'] = stamps
 
-        for key, stamp in seria['stamps'].items():
+        # N = len(seria['stamps'])
+        for im, (key, stamp) in enumerate(seria['stamps'].items()):
             if 'image' not in stamp:
                 print('!!!ERROR stamp with no image: ', key, stamp)
+                print()
                 continue
             image_url = stamp['image']
             try:
                 if not TEST:
-                    raw_data = ur.urlopen(image_url).read()
+                    resp = ur.urlopen(image_url, timeout=200)
+                    if resp is None:
+                        assert False
+                    raw_data = resp.read()
                     b64_bytes = b64encode(raw_data)
                     string_data = b64_bytes.decode(ENCODING)
                     stamp['image'] = string_data
             except Exception as err:
                 print('load {} failed: {}'.format(image_url, err))
+                print()
 
         series_map.append(seria)
 
     # print(series_map)
+    print()
     return series_map
 
 
-def request_and_parse(link):
+def request_and_parse(link, my=False):
     print('\t\t\t\t\t\t', link)
 
     resp = requests.get(link)
@@ -226,7 +258,7 @@ def request_and_parse(link):
     # print(resp.content, file=tout)
     # tout.close()
 
-    _list += parse_response(tree)
+    _list += parse_response(tree, my)
 
     top = str(tree.xpath(TOP)).split('/')
     limit = 0
@@ -237,10 +269,11 @@ def request_and_parse(link):
     for page in range(2, int(limit) + 1):
         page_link = link + '&page={}'.format(page)
         print('>>\t\tpage {}'.format(page))
+        print('\t\t\t\t\t\t', page_link)
         resp = requests.get(page_link)
         if resp.status_code != 200:
             break
-        _list += parse_response(html.fromstring(resp.content))
+        _list += parse_response(html.fromstring(resp.content), my)
     return _list
 
 
@@ -257,7 +290,7 @@ if not TEST:
     fout = open('stamp_base.json', 'wt')
     print(data_json, file=fout)
     fout.close()
-else:
+# else:
     # pp = pprint.PrettyPrinter(indent=4)
     # pp.pprint(data_json)
     print(data_json)
