@@ -30,6 +30,34 @@ FULL_COUNTRIES = [
     'Nukufetau',
     'Nevis',
     'Isle-of-Man',
+    'Paraguay',
+    'New-Brunswick',
+    'United-States',
+    'South-African-Republic',
+    'Honduras',
+    'France',
+    'North-Borneo',
+    'Bulgaria',
+    'Turkey',
+    'German-Empire',
+    'Iran',
+    'Sweden',
+    'India',
+    'Southern-Rhodesia',
+    'Bohemia-and-Moravia',
+    'Dominican-Republic',
+    'Finland',
+    'Australia',
+    'China,-Empire',
+    'Denmark',
+    'French-West-Africa',
+    'Japan',
+    'Switzerland',
+    'Belgian-Congo',
+    'Spain',
+    'Lithuania',
+    'Estonia',
+    'Latvia',
 ]
 
 if TEST:
@@ -37,11 +65,11 @@ if TEST:
 else:
     COUNTRIES = FULL_COUNTRIES
 
-CATEGORIES = [
-    None,
-    'Railway+parcelpost+stamps',
-    'Parcel+post+stamps',
-]
+CATEGORIES_SETTINGS = {
+    'Belgium': ['Railway+parcelpost+stamps', 'Parcel+post+stamps'],
+    'United-States': ['Parcel+post+stamps'],
+    'France': ['Parcel+post+stamps'],
+}
 
 URL = 'https://www.stampworld.com'
 LINK = URL + '/ru/stamps/COUNTRY/?view=wanted&user=383347'
@@ -68,11 +96,14 @@ TOP = './/*[@id="topBlueBarGroupsCatalogLabel"]/text()'
 
 
 def get_country(pre_link, name):
-    print(name, ': ')
+    print('\n', name, ': ')
     link = pre_link.replace('COUNTRY', name)
-    country = {}
-    for category in CATEGORIES:
-        country[category if category is not None else 'default'] = get_category(link, category)
+    country = {
+        'default': get_category(link, None),
+    }
+    if name in CATEGORIES_SETTINGS:
+        for category in CATEGORIES_SETTINGS[name]:
+            country[category] = get_category(link, category)
     return country
 
 
@@ -80,11 +111,11 @@ def get_category(pre_link, name):
     suffix = ''
     if name is not None:
         suffix = '&category_name=' + name
-    print('>>\t', (name if name else 'default').replace('+', ' '), ' >> ')
+    print('>> ', (name if name else 'default').replace('+', ' '))
     link = pre_link + suffix
-    print('>>wishlist')
+    print('>>    wishlist')
     res = request_and_parse(link)
-    print('>>ownlist')
+    print('>>    ownlist')
     res += request_and_parse(link + MAIN, my=True)
     return res
 
@@ -101,7 +132,7 @@ def parse_response(tree, my):
     series = tree.xpath(SERIES_PATH)
     series_map = []
     for i, part in enumerate(series):
-        print('\rseries {} of {}'.format(i+1, len(series)), end="\r")
+        print('\rLoad series {} of {}              '.format(i+1, len(series)), end="\r")
         top = part.xpath(SERIES_TOP)
         tops = str(top).replace('  ', '').split('\\n')
         if len(tops) < 4:
@@ -204,6 +235,8 @@ def parse_response(tree, my):
                         print('filling images for ', boarders)
                     low = int(boarders[0])
                     up = int(boarders[1])
+                    if (up - low) > 30:
+                        continue
                     for i in range(low, up+1):
                         num = str(i)
                         if num not in stamps:
@@ -215,27 +248,6 @@ def parse_response(tree, my):
                             print('{} expected to be in images for {} but not'.format(low, num))
 
         seria['stamps'] = stamps
-
-        # N = len(seria['stamps'])
-        for im, (key, stamp) in enumerate(seria['stamps'].items()):
-            if 'image' not in stamp:
-                print('!!!ERROR stamp with no image: ', key, stamp)
-                print()
-                continue
-            image_url = stamp['image']
-            try:
-                if not TEST:
-                    resp = ur.urlopen(image_url, timeout=200)
-                    if resp is None:
-                        assert False
-                    raw_data = resp.read()
-                    b64_bytes = b64encode(raw_data)
-                    string_data = b64_bytes.decode(ENCODING)
-                    stamp['image'] = string_data
-            except Exception as err:
-                print('load {} failed: {}'.format(image_url, err))
-                print()
-
         series_map.append(seria)
 
     # print(series_map)
@@ -243,13 +255,50 @@ def parse_response(tree, my):
     return series_map
 
 
+def load_series_images(seria):
+    for im, (key, stamp) in enumerate(seria['stamps'].items()):
+        if 'image' not in stamp:
+            # print('!!!ERROR stamp with no image: ', key, stamp)
+            # print()
+            continue
+        image_url = stamp['image']
+        try:
+            if not TEST:
+                resp = ur.urlopen(image_url, timeout=200)
+                if resp is None:
+                    assert False
+                raw_data = resp.read()
+                b64_bytes = b64encode(raw_data)
+                string_data = b64_bytes.decode(ENCODING)
+                stamp['image'] = string_data
+        except Exception as err:
+            print('load {} failed: {}'.format(image_url, err))
+            print()
+
+
+def load_images(_data):
+    print('\n\nLoading images')
+    for i, (country, series_map) in enumerate(_data.items()):
+        n_series = 0
+        for series in series_map.values():
+            n_series += len(series)
+        i_series = 0
+        for series in series_map.values():
+            for seria in series:
+                i_series += 1
+                print(
+                    '\rLoading {} ({} of {}), series {} of {} ({} stamps)'.format(
+                        country, i+1, len(_data), i_series, n_series, len(seria['stamps'])), end="\r"
+                )
+                load_series_images(seria)
+
+
 def request_and_parse(link, my=False):
-    print('\t\t\t\t\t\t', link)
+    print('>>      request ', link, end='\t\t')
 
     resp = requests.get(link)
     print(resp.status_code)
-    if resp.status_code != 200:
-        return []
+    assert (resp.status_code == 200, 'REQUEST ERROR!')
 
     _list = []
 
@@ -268,11 +317,11 @@ def request_and_parse(link, my=False):
 
     for page in range(2, int(limit) + 1):
         page_link = link + '&page={}'.format(page)
-        print('>>\t\tpage {}'.format(page))
-        print('\t\t\t\t\t\t', page_link)
+        print('>>      page {} of {}'.format(page, int(limit)), end='\t\t')
+        print(page_link, end='\t\t')
         resp = requests.get(page_link)
-        if resp.status_code != 200:
-            break
+        print(resp.status_code)
+        assert (resp.status_code == 200, 'REQUEST ERROR!')
         _list += parse_response(html.fromstring(resp.content), my)
     return _list
 
@@ -281,6 +330,7 @@ def load():
     _data = {}
     for country in COUNTRIES:
         _data[country] = get_country(LINK, country)
+    load_images(_data)
     return _data
 
 
@@ -290,7 +340,7 @@ if not TEST:
     fout = open('stamp_base.json', 'wt')
     print(data_json, file=fout)
     fout.close()
-# else:
+else:
     # pp = pprint.PrettyPrinter(indent=4)
     # pp.pprint(data_json)
     print(data_json)

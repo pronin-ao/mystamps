@@ -28,18 +28,29 @@ Rectangle {
                     id: image
                     source: {
                         (modelData.image === "") ? "" :
-                        "data:image/jpg;base64,"+modelData.image
+                        "data:image/jpg;base64," + modelData.image
                     }
                     fillMode: Image.PreserveAspectFit
+                    Timer {
+                        id: timer
+                        interval: 500
+                        running: false
+                        repeat: false
+                    }
                     TapHandler {
-                        onDoubleTapped: {
+                        onTapped: {
+                            if(timer.running) {
+                                modelData.checked = !modelData.checked;
+                                catalogue.checkStamp(modelData);
+                               timer.stop()
+                            }else {
+                                timer.start()
+                            }
+                        }
+                        onLongPressed: {
                             showStamp.visible = true;
                             showStamp.stampData = modelData;
                             grid.visible = false;
-                        }
-                        onLongPressed: {
-                            modelData.checked = !modelData.checked;
-                            catalogue.checkStamp(modelData);
                         }
                     }
 
