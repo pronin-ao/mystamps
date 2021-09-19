@@ -72,6 +72,8 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
         std::move(cond),
         db::AddParams{}
       };
+      if(num == "848")
+        qDebug() << "!!!" << new_stamp.owned;
       res.emplace(num, std::move(new_stamp));
     }
   return res;
@@ -102,8 +104,14 @@ db::Country ParseSpec(const QJsonValue& json, const Context& context){
       if(!res[year].count(name))
         res[year].emplace(name, seria);
       else {
-          qDebug() << "Seria "<< name_it->toString() << " duplicated";
+          //qDebug() << "Seria "<< name_it->toString() << " duplicated";
         res[year][name].merge(seria);
+        if(!seria.empty()) {
+          for(auto& stamp: seria) {
+            if(stamp.second.owned)
+              res[year][name][stamp.first] = stamp.second;
+          }
+        }
       }
     }
   return res;

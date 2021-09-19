@@ -8,8 +8,9 @@ Catalogue::Catalogue(QObject *parent) : QObject(parent)
 
 
 void Catalogue::setYears(QStringList &&years)
-{
+{  
   _years = std::move(years);
+  _fullYears = _years;
   emit yearsChanged();
 
 }
@@ -21,8 +22,9 @@ void Catalogue::setYears(const QStringList& years)
 }
 
 void Catalogue::setCountries(QStringList &&countries)
-{
+{  
   _countries = std::move(countries);
+  _fullCountries = _countries;
   emit countriesChanged();
 }
 
@@ -35,6 +37,7 @@ void Catalogue::setCountries(const QStringList &countries)
 void Catalogue::setPrices(QStringList &&prices)
 {
   _prices = std::move(prices);
+  _fullPrices = _prices;
   emit pricesChanged();
 }
 
@@ -147,6 +150,15 @@ void Catalogue::applyOrder(const QString &sort_order)
 void Catalogue::checkStamp(const Stamp &stamp)
 {
   emit stampChanges(stamp);
+}
+
+void Catalogue::filter(QString text, QString filterType)
+{
+  QStringList res{};
+  if(filterType == filters::kCountries)
+    res = _fullCountries.filter(text, Qt::CaseInsensitive);
+  emit getFilter(res);
+
 }
 
 void Catalogue::setStamps(QVariantList &&stamps)

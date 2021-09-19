@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.15
 
 Rectangle{
     id: root
-    color: "#aaaaff"
+    color: "#3300ff00"
     width: parent.width
     height: parent.height - menu.height
     anchors.top: menu.bottom
@@ -16,6 +16,7 @@ Rectangle{
 
     signal apply(var new_filter)
     signal restore(var old_filter)
+    signal filterText(var filter)
 
     ListView {
         id: list
@@ -44,11 +45,10 @@ Rectangle{
                 }
                 background: Rectangle {
                     visible: true
-                    color: checked ? "#00000000": "#3300ff00"
+                    color: checked ? "#aaaaff": "#00000000"
                 }
             }
         }
-
         model: parent.filterModel
         delegate: filterDelegate
     }
@@ -57,7 +57,7 @@ Rectangle{
     RowLayout {
         id: result
         anchors.top: parent.top
-        height: parent.height / 8
+        height: parent.height / 16
         width: parent.width
         spacing: 2
 
@@ -85,9 +85,34 @@ Rectangle{
         }
     }
 
+    TextEdit{
+        id: search
+        anchors.top: result.bottom
+        anchors.left: parent.left
+        height: parent.height / 16
+        width: parent.width*0.9
+    }
+
+    Button {
+        anchors.top: result.bottom
+        anchors.left: search.right
+        height: parent.height / 16
+        width: parent.width/10
+        text: "Ok"
+        background: Rectangle {
+            color: "#33ff44"
+        }
+
+        onClicked: {
+            if(search.text.length > 0)
+                root.filterText(search.text)
+        }
+
+    }
+
     RowLayout{
         id: quickers
-        anchors.top: result.bottom
+        anchors.top: search.bottom
         height: parent.height / 8
         width: parent.width
         spacing: 2

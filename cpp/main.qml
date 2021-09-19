@@ -21,6 +21,10 @@ Window{
         id: catalogue
         years: [0]
         countries: ["all"]
+
+        onGetFilter: {
+            filter.filterModel = list;
+        }
     }
 
     Custom.StampList{
@@ -58,6 +62,10 @@ Window{
                 catalogue.setYearFilter(old_filter)
             else if(mainWindow.filterType == "price")
                 catalogue.setPriceFilter(old_filter)
+        }
+
+        onFilterText: {
+            catalogue.filter(filter, mainWindow.filterType)
         }
     }
 

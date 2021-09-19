@@ -5,71 +5,9 @@ import pprint
 import requests
 import urllib.request as ur
 
-TEST = False
 
+from country_list import *
 
-FULL_COUNTRIES = [
-    'USSR',
-    'Belgium',
-    'Austria',
-    'Poland',
-    'Russia',
-    'St.-Lucia',
-    'Union-Island',
-    'St.-Vincent-And-The-Grenadines',
-    'St.-Vincent',
-    'Grenadines-Of-St.-Vincent',
-    'Bequia',
-    'Cuba',
-    'Tuvalu',
-    'Vaitupu',
-    'Niutao',
-    'Funafuti',
-    'Nanumea',
-    'Nui',
-    'Nukufetau',
-    'Nevis',
-    'Isle-of-Man',
-    'Paraguay',
-    'New-Brunswick',
-    'United-States',
-    'South-African-Republic',
-    'Honduras',
-    'France',
-    'North-Borneo',
-    'Bulgaria',
-    'Turkey',
-    'German-Empire',
-    'Iran',
-    'Sweden',
-    'India',
-    'Southern-Rhodesia',
-    'Bohemia-and-Moravia',
-    'Dominican-Republic',
-    'Finland',
-    'Australia',
-    'China,-Empire',
-    'Denmark',
-    'French-West-Africa',
-    'Japan',
-    'Switzerland',
-    'Belgian-Congo',
-    'Spain',
-    'Lithuania',
-    'Estonia',
-    'Latvia',
-]
-
-if TEST:
-    COUNTRIES = ['USSR']
-else:
-    COUNTRIES = FULL_COUNTRIES
-
-CATEGORIES_SETTINGS = {
-    'Belgium': ['Railway+parcelpost+stamps', 'Parcel+post+stamps'],
-    'United-States': ['Parcel+post+stamps'],
-    'France': ['Parcel+post+stamps'],
-}
 
 URL = 'https://www.stampworld.com'
 LINK = URL + '/ru/stamps/COUNTRY/?view=wanted&user=383347'
@@ -233,8 +171,8 @@ def parse_response(tree, my):
                     boarders = num.split('‑')
                     if TEST:
                         print('filling images for ', boarders)
-                    low = int(boarders[0])
-                    up = int(boarders[1])
+                    low = int(boarders[0].replace('A', '').replace('B', ''))
+                    up = int(boarders[1].replace('B', '').replace('A', ''))
                     if (up - low) > 30:
                         continue
                     for i in range(low, up+1):
@@ -287,7 +225,7 @@ def load_images(_data):
             for seria in series:
                 i_series += 1
                 print(
-                    '\rLoading {} ({} of {}), series {} of {} ({} stamps)'.format(
+                    '\rLoading {} ({} of {}), series {} of {} ({} stamps)                         '.format(
                         country, i+1, len(_data), i_series, n_series, len(seria['stamps'])), end="\r"
                 )
                 load_series_images(seria)
@@ -298,7 +236,7 @@ def request_and_parse(link, my=False):
 
     resp = requests.get(link)
     print(resp.status_code)
-    assert (resp.status_code == 200, 'REQUEST ERROR!')
+    assert (resp.status_code == 200, 'REQUEST ERROR! {}'.format(resp.status_code))
 
     _list = []
 
@@ -321,7 +259,7 @@ def request_and_parse(link, my=False):
         print(page_link, end='\t\t')
         resp = requests.get(page_link)
         print(resp.status_code)
-        assert (resp.status_code == 200, 'REQUEST ERROR!')
+        assert (resp.status_code == 200, 'REQUEST ERROR! {}'.format(resp.status_code))
         _list += parse_response(html.fromstring(resp.content), my)
     return _list
 
@@ -330,7 +268,7 @@ def load():
     _data = {}
     for country in COUNTRIES:
         _data[country] = get_country(LINK, country)
-    load_images(_data)
+    # load_images(_data)
     return _data
 
 

@@ -31,6 +31,7 @@ Rectangle {
             onClicked: {
                 filter.filterModel = catalogue.years
                 filter.filtered = catalogue.yearsFilter
+                filter.backup = catalogue.yearsFilter.slice();
                 filter.visible = true
                 content.visible = false
                 mainWindow.filterType = "year";

@@ -58,6 +58,10 @@ namespace sorting {
   const QString kPrice = "price";
   const QString kSeries = "series";
 }
+
+namespace filters {
+  const QString kCountries = "countries";
+}
 namespace order {
   const QString kRaise = "raise";
   const QString kFall = "fall";
@@ -147,6 +151,8 @@ public slots:
 
   void checkStamp(const Stamp& stamp);
 
+  void filter(QString text, QString filterType);
+
 
 signals:
   void yearsChanged();
@@ -166,10 +172,16 @@ signals:
 
   void stampChanges(const Stamp&);
 
+  void getFilter(const QStringList& list);
+
 private:
   QStringList _years = {};
   QStringList _countries = {};
   QStringList _prices = {};
+
+  QStringList _fullYears = {};
+  QStringList _fullCountries = {};
+  QStringList _fullPrices = {};
 
   QStringList _yearsFilter = {};
   QStringList _countriesFilter = {};
