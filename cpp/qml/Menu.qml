@@ -9,11 +9,16 @@ Rectangle {
     GridLayout{
         anchors.fill: parent
         columns: Math.max(1,Math.min(4, mainWindow.width / mainWindow.buttonSize))
-        rowSpacing: 2
-        columnSpacing: 2
+        rowSpacing: 3
+        columnSpacing: 3
+        anchors.margins: 2
+
         Button {
             id: country; Layout.fillWidth: true; Layout.fillHeight: true
+            Layout.maximumWidth: 270
             text: "Countries"
+            font.bold: true
+            font.pointSize: 15
 
             onClicked: {
                 filter.filtered = catalogue.countriesFilter;
@@ -27,6 +32,8 @@ Rectangle {
         Button {
             id: year; Layout.fillWidth: true; Layout.fillHeight: true
             text: "Year"
+            font.bold: true
+            font.pointSize: 15
 
             onClicked: {
                 filter.filterModel = catalogue.years
@@ -39,12 +46,15 @@ Rectangle {
         }
         ColumnLayout{
             Layout.fillWidth: true; Layout.fillHeight: true
-            spacing: 1
+            Layout.minimumWidth: 200
+            spacing: 2
             Button {
                 height: parent.height / 2
                 width: parent.width
                 id: price; Layout.fillWidth: true; Layout.fillHeight: true
                 text: "Prices"
+                font.bold: true
+                font.pointSize: 15
 
                 onClicked: {
                     filter.filterModel = catalogue.prices
@@ -62,6 +72,8 @@ Rectangle {
                 displayText: "Show "+currentText
                 model: ["all", "owned", "wishlist"]
                 currentIndex: 0
+                font.bold: true
+                font.pointSize: 15
 
                 onCurrentTextChanged: {
                     catalogue.showMode = currentText
@@ -72,7 +84,8 @@ Rectangle {
 
         ColumnLayout{
             Layout.fillWidth: true; Layout.fillHeight: true
-            spacing: 1
+            Layout.minimumWidth: 200
+            spacing: 2
             ComboBox {
                 Layout.fillWidth: true; Layout.fillHeight: true
                 id: sorting;
@@ -81,6 +94,8 @@ Rectangle {
                 displayText: "Sort by "+currentText
                 model: ["price", "year", "country", "series"]
                 currentIndex: 1
+                font.bold: true
+                font.pointSize: 15
 
                 onCurrentTextChanged: {
                     catalogue.applySort(currentText)
@@ -94,6 +109,8 @@ Rectangle {
                 displayText: "Order: "+currentText
                 model: ["raise", "fall"]
                 currentIndex: 0
+                font.bold: true
+                font.pointSize: 15
 
                 onCurrentTextChanged: {
                     catalogue.applyOrder(currentText)

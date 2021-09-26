@@ -72,8 +72,6 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
         std::move(cond),
         db::AddParams{}
       };
-      if(num == "848")
-        qDebug() << "!!!" << new_stamp.owned;
       res.emplace(num, std::move(new_stamp));
     }
   return res;

@@ -268,7 +268,6 @@ def load():
     _data = {}
     for country in COUNTRIES:
         _data[country] = get_country(LINK, country)
-    # load_images(_data)
     return _data
 
 

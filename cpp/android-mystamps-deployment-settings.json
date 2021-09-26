@@ -10,6 +10,7 @@
    "architectures": {"armeabi-v7a":"arm-linux-androideabi", "arm64-v8a":"aarch64-linux-android", "x86":"i686-linux-android", "x86_64":"x86_64-linux-android"},
    "android-min-sdk-version": "27",
    "android-target-sdk-version": "28",
+   "android-extra-libs": "/home/pronin-ao/openssl/android_openssl/latest/arm/libcrypto_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/arm/libssl_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/arm64/libcrypto_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/arm64/libssl_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/x86/libcrypto_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/x86/libssl_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/x86_64/libcrypto_1_1.so,/home/pronin-ao/openssl/android_openssl/latest/x86_64/libssl_1_1.so",
    "qml-root-path": "/home/pronin-ao/mycode/mystamps/cpp",
    "stdcpp-path": "/home/pronin-ao/Android/Ndk/android-ndk-r20b//toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/",
    "qrcFiles": "/home/pronin-ao/mycode/mystamps/cpp/res.qrc",

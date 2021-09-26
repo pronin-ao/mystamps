@@ -1,11 +1,17 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QMessageBox>
+#include <QtGlobal>
+#include <QSslSocket>
 
 #include "datamanager.h"
 #include "catalogue.h"
 
+
+
 int main(int argc, char* argv[]) {
+    qputenv("ANDROID_OPENSSL_SUFFIX", "_1_1");
+    qInfo() << "Device supports OpenSSL: " << QSslSocket::supportsSsl();
 
 	QApplication a(argc, argv);
 

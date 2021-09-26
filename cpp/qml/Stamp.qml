@@ -23,10 +23,7 @@ Rectangle{
     }
     Image {
         id: stamp
-        source: {
-            (showStamp.stampData.image === "") ? "" :
-            "data:image/jpg;base64,"+showStamp.stampData.image
-        }
+        source: showStamp.stampData.image
         anchors.top: topText.bottom
         anchors.bottom: bottomText.top
         width: parent.width

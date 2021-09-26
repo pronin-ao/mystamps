@@ -30,9 +30,9 @@ Window{
     Custom.StampList{
         id: content
         width: parent.width
-        height: parent.height - menu.height
+        height: parent.height - menu.height - actionBar.height
         color: "black"
-        anchors.bottom: parent.bottom
+        anchors.bottom: actionBar.top
     }
 
     Custom.Menu {
@@ -68,5 +68,14 @@ Window{
             catalogue.filter(filter, mainWindow.filterType)
         }
     }
+
+    Custom.ActionBar {
+        id: actionBar
+        height: 150
+        width: parent.width
+        anchors.bottom: parent.bottom
+        color: "darkgrey"
+    }
+
 
 }

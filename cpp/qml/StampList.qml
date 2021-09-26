@@ -6,6 +6,10 @@ import "./" as Custom
 
 Rectangle {
     id: content
+    property bool stampView: showStamp.visible
+    property string year: showStamp.stampData.year
+    property string country: showStamp.stampData.country
+    property string spec: showStamp.stampData.spec
     GridView {
         id: grid
         anchors.fill: parent
@@ -26,18 +30,21 @@ Rectangle {
                 Image{
                     anchors.fill: parent
                     id: image
-                    source: {
-                        (modelData.image === "") ? "" :
-                        "data:image/jpg;base64," + modelData.image
-                    }
+                    source:  modelData.image
                     fillMode: Image.PreserveAspectFit
+                    property bool showMore: false
                     Timer {
                         id: timer
                         interval: 500
                         running: false
                         repeat: false
+
+                        onTriggered: {
+                            image.showMore = !image.showMore
+                        }
                     }
                     TapHandler {
+                        //grabPermissions: PointerHandler.TakeOverForbidden
                         onTapped: {
                             if(timer.running) {
                                 modelData.checked = !modelData.checked;
@@ -59,15 +66,25 @@ Rectangle {
                         visible: modelData.checked
                         color: "#5088cc88"
                     }
-                    Text{
-                        visible: {parent.source == ""}
+                    Rectangle {
                         anchors.fill: parent
-                        color: "#cccccc"
+                        visible: (image.showMore && parent.source != "")
+                        color: "#aa000000"
+                    }
+                    Text{
+                        visible: {parent.source == "" || image.showMore}
+                        anchors.fill: parent
+                        color: image.showMore ? "#fff0f0" :"#cccccc"
+                        font.bold: true
+                        font.pointSize: 16
                         text: {
                              modelData.country + ",   " +
                              modelData.year + "\n" +
                              modelData.color + ",   " +
-                             modelData.price
+                             modelData.price + "\n" +
+                             (image.showMore?(
+                             modelData.series + "\n" +
+                             modelData.capture): "")
                         }
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -78,6 +95,8 @@ Rectangle {
                     visible: modelData.owned
                     color: "#bb3300"
                     font.bold: true
+                    font.pointSize: 18
+
                     text: {
                         ((modelData.conditions.indexOf("mnh")>=0)
                          ? "**\n" : "") +
@@ -88,7 +107,9 @@ Rectangle {
                         ((modelData.conditions.indexOf("fdc")>=0)
                          ?"[fdc]":"")
                     }
+
                 }
+
             }
         }
 

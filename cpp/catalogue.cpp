@@ -50,6 +50,7 @@ void Catalogue::setPrices(const QStringList &prices)
 void Catalogue::setCountriesFilter(const QStringList &filter)
 {
   _countriesFilter = filter;
+  emit countriesFilterChanged();
 }
 
 void Catalogue::setYearsFilter(const QStringList &filter)
@@ -66,7 +67,8 @@ void Catalogue::applyCountriesFilter(const QStringList &filter)
 {
   qDebug() << "Apply countries: "<<filter;
   _countriesFilter = filter;
-  emit sendCountriesFilter(_countriesFilter);
+  emit countriesFilterChanged();
+  emit sendCountriesFilter(_countriesFilter);  
 }
 
 void Catalogue::applyYearFilter(const QStringList &filter)

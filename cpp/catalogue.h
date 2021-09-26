@@ -82,7 +82,7 @@ class Catalogue : public QObject
   Q_PROPERTY(QStringList countries
              READ countries WRITE setCountries NOTIFY countriesChanged)
   Q_PROPERTY(QStringList yearsFilter READ yearsFilter WRITE setYearsFilter)
-  Q_PROPERTY(QStringList countriesFilter READ countriesFilter WRITE setCountriesFilter)
+  Q_PROPERTY(QStringList countriesFilter READ countriesFilter WRITE setCountriesFilter NOTIFY countriesFilterChanged)
   Q_PROPERTY(QVariantList stamps READ stamps NOTIFY stampsUpdated)
   Q_PROPERTY(QString sorting READ sorting NOTIFY sortingChanged)
   Q_PROPERTY(QString order READ order NOTIFY orderChanged)
@@ -173,6 +173,7 @@ signals:
   void stampChanges(const Stamp&);
 
   void getFilter(const QStringList& list);
+  void countriesFilterChanged();
 
 private:
   QStringList _years = {};
