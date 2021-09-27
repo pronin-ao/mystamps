@@ -19,6 +19,12 @@ namespace names {
   const QString kOwned = "owned";
   const QString kCond = "cond";
 
+  const QString kSwLink = "sw_link";
+  const QString kHasList = "has_list";
+  const QString kListOwned = "list_owned";
+  const QString kListCond = "list_cond";
+  const QString kListNote = "list_note";
+
   const QString kChecked = "checked";
 
 }
@@ -46,6 +52,25 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
   if(!stamps_it->isObject())
     throw std::runtime_error("Stamps in not an object");
 
+  const auto& sw_link = json.value(names::kSwLink).toString("").toStdString();
+  const bool has_list = json.value(names::kHasList).toBool(false);
+  std::optional<bool> list_owned{};
+  std::optional<db::Conditions> list_conditions{};
+  if(has_list){
+    list_owned = json.value(names::kListOwned).toBool(false);
+    if(json.contains(names::kListCond)){
+      const auto& cond_json = json.value(names::kListCond).toArray({});
+      db::Conditions cond{};
+      cond.reserve(cond_json.size());
+      std::transform(cond_json.begin(), cond_json.end(),
+                     std::back_inserter(cond),[](const auto& val){
+          return val.toString().toStdString();
+        });
+      list_conditions = std::move(cond);
+    }
+  }
+
+
   const auto& stamps = stamps_it->toObject();
   res.reserve(stamps.size());
   for(auto it = stamps.begin(); it != stamps.end(); ++it){
@@ -61,6 +86,10 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
                      std::back_inserter(cond),[](const auto& val){
           return val.toString().toStdString();
         });
+      db::ListNote list_note{};
+      if(stamp.contains(names::kListNote)){
+         list_note = stamp[names::kListNote].toString().toStdString();
+      }
       db::Stamp new_stamp{
         stamp.value(names::kImage).toString("").toStdString(),
         context.spec.value_or(""),
@@ -70,6 +99,11 @@ db::Series ParseSeries(const QJsonObject& json, const Context& context) {
         stamp.value(names::kColor).toString("").toStdString(),
         stamp.value(names::kOwned).toBool(false),
         std::move(cond),
+        sw_link,
+        has_list,
+        list_note,
+        list_owned,
+        list_conditions,
         db::AddParams{}
       };
       res.emplace(num, std::move(new_stamp));

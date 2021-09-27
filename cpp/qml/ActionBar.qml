@@ -148,7 +148,7 @@ Rectangle{
             font.pointSize: 16
 
             onClicked: {
-                console.log(content.spec)
+                Qt.openUrlExternally(content.seriesLink)
             }
 
             onVisibleChanged: {

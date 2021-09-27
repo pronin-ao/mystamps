@@ -10,6 +10,7 @@ Rectangle {
     property string year: showStamp.stampData.year
     property string country: showStamp.stampData.country
     property string spec: showStamp.stampData.spec
+    property string seriesLink: showStamp.stampData.sw_link
     GridView {
         id: grid
         anchors.fill: parent
@@ -44,7 +45,6 @@ Rectangle {
                         }
                     }
                     TapHandler {
-                        //grabPermissions: PointerHandler.TakeOverForbidden
                         onTapped: {
                             if(timer.running) {
                                 modelData.checked = !modelData.checked;
@@ -98,14 +98,19 @@ Rectangle {
                     font.pointSize: 18
 
                     text: {
-                        ((modelData.conditions.indexOf("mnh")>=0)
+                        var conds = modelData.conditions;
+                        if(conds.length === 0 && modelData.list_owned){
+                            conds = modelData.list_conditions;
+                        }
+                        ((conds.indexOf("mnh")>=0)
                          ? "**\n" : "") +
-                        ((modelData.conditions.indexOf("mint")>=0)
+                        ((conds.indexOf("mint")>=0)
                          ? "*\n": "") +
-                        ((modelData.conditions.indexOf("used")>=0)
+                        ((conds.indexOf("used")>=0)
                          ?"#\n":"") +
-                        ((modelData.conditions.indexOf("fdc")>=0)
-                         ?"[fdc]":"")
+                        ((conds.indexOf("fdc")>=0)
+                         ?"[fdc]\n":"") +
+                        (modelData.has_list?(modelData.list_owned?"LIST":modelData.list_note):"")
                     }
 
                 }

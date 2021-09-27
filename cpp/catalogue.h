@@ -19,6 +19,11 @@ class Stamp {
   Q_PROPERTY(QString series READ series)
   Q_PROPERTY(bool owned READ owned)
   Q_PROPERTY(QStringList conditions READ conditions)
+  Q_PROPERTY(QString sw_link READ sw_link)
+  Q_PROPERTY(bool has_list READ has_list)
+  Q_PROPERTY(QString list_note READ list_note)
+  Q_PROPERTY(bool list_owned READ list_owned)
+  Q_PROPERTY(QStringList list_conditions READ list_conditions)
 
 public:
   inline auto capture() const {return _capture;}
@@ -34,6 +39,12 @@ public:
   inline auto series() const {return _series;}
   inline auto owned() const {return _owned;}
   inline auto conditions() const {return _conditions;}
+  inline auto sw_link() const {return _sw_link;}
+  inline auto has_list() const {return _has_list;}
+  inline auto list_note() const {return _list_note;}
+  inline auto list_owned() const {return _list_owned;}
+  inline auto list_conditions() const {return _list_conditions;}
+
 
   void setChecked(const bool checked);
 
@@ -50,6 +61,11 @@ public:
   QString _series;
   bool _owned;
   QStringList _conditions;
+  QString _sw_link;
+  bool _has_list;
+  QString _list_note;
+  bool _list_owned;
+  QStringList _list_conditions;
 };
 
 namespace sorting {

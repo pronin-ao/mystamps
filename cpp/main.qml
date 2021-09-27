@@ -45,6 +45,10 @@ Window{
     Custom.Filter {
         id: filter
         visible: false
+        color: "#3300ff00"
+        width: parent.width
+        height: parent.height - menu.height - actionBar.height
+        anchors.top: menu.bottom
 
         onApply: {
             if(mainWindow.filterType == "countries")
@@ -71,7 +75,7 @@ Window{
 
     Custom.ActionBar {
         id: actionBar
-        height: 150
+        height: 110
         width: parent.width
         anchors.bottom: parent.bottom
         color: "darkgrey"

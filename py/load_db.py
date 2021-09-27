@@ -12,7 +12,7 @@ from country_list import *
 URL = 'https://www.stampworld.com'
 LINK = URL + '/ru/stamps/COUNTRY/?view=wanted&user=383347'
 MAIN = '&cid=164812'
-
+# div[2]/div[1]/div/a
 SERIES_PATH = '/html/body/div[1]/div/div[2]/div/div[1]/div/div[4]/div'
 NUMBER_PATH = 'div[3]/table/tbody/tr/th/a/text()'
 TYPE_PATH = 'div[3]/table/tbody/tr/td[1]/a'
@@ -25,6 +25,7 @@ MINT_PATH = 'div[3]/table/tbody/tr/td[10]'
 USED_PATH = 'div[3]/table/tbody/tr/td[11]'
 FDC_PATH = 'div[3]/table/tbody/tr/td[12]'
 SERIES_TOP = 'div[1]/div/a/text()'
+LINK_PATH = 'div[1]/div/a/@href'
 
 IMAGES_PATH = 'div[2]/div/span/' + GET_IMAGE
 IMAGES_LINKS = 'div[2]/div/span'
@@ -76,7 +77,9 @@ def parse_response(tree, my):
         if len(tops) < 4:
             continue
 
-        seria = {'year': tops[2], 'capture': tops[3]}
+        link = part.xpath(LINK_PATH)
+
+        seria = {'year': tops[2], 'capture': tops[3], 'sw_link': link[0]}
 
         prices = part.xpath(PRICE_PATH)
         str_prices = [clrstr(str(price)) for price in prices]
@@ -114,7 +117,9 @@ def parse_response(tree, my):
             images_map[code] = image
 
         if TEST:
+            print('pre_images: ', images)
             print('images: ', [k for k in images_map.keys()])
+            print('nums: ', str_numbers)
 
         assert len(str_numbers) == len(str_prices)
         assert len(str_numbers) == len(str_caps)
@@ -126,10 +131,36 @@ def parse_response(tree, my):
         assert len(str_numbers) == len(useds)
         assert len(str_numbers) == len(fdcs)
 
+        unique_nums = set()
+        num_range = None
+        for num in str_numbers:
+            if '‑' not in num:
+                unique_nums.add(num)
+            else:
+                num_range = num
+        has_list = len(unique_nums) != len(str_numbers)
+        full_size = len(unique_nums)
+        if has_list:
+            seria['has_list'] = True
+        indexes = list(range(len(str_numbers)))
+        if num_range:
+            boarders = num.split('‑')
+            low = int(boarders[0].replace('A', '').replace('B', ''))
+            up = int(boarders[1].replace('A', '').replace('B', ''))
+            full_size = up - low + 1
+            for ind in range(len(indexes)):
+                if '‑' not in str_numbers[ind]:
+                    try:
+                        indexes[ind] = int(str_numbers[ind].replace('A', '').replace('B', '')) - low
+                    except:
+                        pass
+                    finally:
+                        pass
+
         stamps = {}
-        for num, typ, price, cap, color, mnh, mint, used, fdc in zip(
+        for num, typ, price, cap, color, mnh, mint, used, fdc, index in zip(
                 str_numbers, str_types, str_prices, str_caps, str_colors,
-                mnhs, mints, useds, fdcs
+                mnhs, mints, useds, fdcs, indexes
         ):
             if TEST:
                 print('# {}, type {}, price {}'.format(num, typ, price))
@@ -143,6 +174,8 @@ def parse_response(tree, my):
                     'color': color,
                     'owned': my,
                 }
+                if has_list:
+                    stamp['list_note'] = '{} of {}'. format(index+1, full_size)
                 if my:
                     stamp['cond'] = []
                     if len(str(mnh.xpath(GET_IMAGE))) > 2:
@@ -164,6 +197,19 @@ def parse_response(tree, my):
                     print('WARN: ', typ, num, ' not in map')
                 stamps[num] = stamp
             else:
+                if my:
+                    seria['list_cond'] = []
+                    if len(str(mnh.xpath(GET_IMAGE))) > 2:
+                        # print(len(str(mnh.xpath(GET_IMAGE))))
+                        seria['list_cond'].append('mnh')
+                    if len(str(mint.xpath(GET_IMAGE))) > 2:
+                        seria['list_cond'].append('mint')
+                    if len(str(used.xpath(GET_IMAGE))) > 2:
+                        seria['list_cond'].append('used')
+                    if len(str(fdc.xpath(GET_IMAGE))) > 2:
+                        seria['list_cond'].append('fdc')
+                    seria['list_owned'] = len(seria['list_cond']) > 0
+
                 if '‑' not in num:
                     if num in images_map:
                         stamps[num]['image'] = images_map[num]
@@ -191,44 +237,6 @@ def parse_response(tree, my):
     # print(series_map)
     print()
     return series_map
-
-
-def load_series_images(seria):
-    for im, (key, stamp) in enumerate(seria['stamps'].items()):
-        if 'image' not in stamp:
-            # print('!!!ERROR stamp with no image: ', key, stamp)
-            # print()
-            continue
-        image_url = stamp['image']
-        try:
-            if not TEST:
-                resp = ur.urlopen(image_url, timeout=200)
-                if resp is None:
-                    assert False
-                raw_data = resp.read()
-                b64_bytes = b64encode(raw_data)
-                string_data = b64_bytes.decode(ENCODING)
-                stamp['image'] = string_data
-        except Exception as err:
-            print('load {} failed: {}'.format(image_url, err))
-            print()
-
-
-def load_images(_data):
-    print('\n\nLoading images')
-    for i, (country, series_map) in enumerate(_data.items()):
-        n_series = 0
-        for series in series_map.values():
-            n_series += len(series)
-        i_series = 0
-        for series in series_map.values():
-            for seria in series:
-                i_series += 1
-                print(
-                    '\rLoading {} ({} of {}), series {} of {} ({} stamps)                         '.format(
-                        country, i+1, len(_data), i_series, n_series, len(seria['stamps'])), end="\r"
-                )
-                load_series_images(seria)
 
 
 def request_and_parse(link, my=False):

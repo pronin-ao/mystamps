@@ -198,6 +198,15 @@ void DataManager::applyPriceFilter(const QStringList &filter)
                   std::transform(stamp.second.condition.begin(), stamp.second.condition.end(),
                                  std::back_inserter(conds),
                                  [](const auto& str){return QString::fromStdString(str);});
+
+                  QStringList list_conds{};
+                  if(stamp.second.list_conditions){
+                    conds.reserve(stamp.second.list_conditions->size());
+                    std::transform(stamp.second.list_conditions->begin(),
+                                   stamp.second.list_conditions->end(),
+                                   std::back_inserter(list_conds),
+                                   [](const auto& str){return QString::fromStdString(str);});
+                  }
                 var.setValue(
                       Stamp{
                         QString::fromStdString(stamp.second.capture),
@@ -211,7 +220,12 @@ void DataManager::applyPriceFilter(const QStringList &filter)
                         QString::fromStdString(stamp.second.code),
                         QString::fromStdString(stamp.second.color),
                         QString::fromStdString(cap),
-                        stamp.second.owned,std::move(conds)
+                        stamp.second.owned,std::move(conds),
+                        QString::fromStdString(stamp.second.sw_link),
+                        stamp.second.has_list,
+                        QString::fromStdString(stamp.second.list_note.value_or("")),
+                        stamp.second.list_owned.value_or(false),
+                        list_conds
                       });
                 return var;
                 });

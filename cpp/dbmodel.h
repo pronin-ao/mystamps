@@ -18,7 +18,10 @@ namespace db {
   using Capture = std::string;
   using Color = std::string;
   using Conditions = std::vector<std::string>;
+  using Link = std::string;
+  using ListNote = std::optional<std::string>;
   struct Stamp{
+
     Image image = "";
     Spec spec = "";
     Price price = "";
@@ -27,6 +30,11 @@ namespace db {
     Color color = "";
     bool owned = false;
     Conditions condition{};
+    Link sw_link = "";
+    bool has_list = false;
+    ListNote list_note;
+    std::optional<bool> list_owned;
+    std::optional<Conditions> list_conditions;
 
 
     AddParams add{};

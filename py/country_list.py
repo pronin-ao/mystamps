@@ -1,4 +1,4 @@
-TEST = True
+TEST = False
 
 EUROPA = [
     'Austria',  # !
@@ -229,7 +229,7 @@ FULL_COUNTRIES += ASIA
 FULL_COUNTRIES += AUSTRALIA
 
 if TEST:
-    COUNTRIES = ['Austria']
+    COUNTRIES = ['North-Korea']
 else:
     COUNTRIES = FULL_COUNTRIES
 
