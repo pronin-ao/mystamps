@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = mystamps
 INCLUDEPATH += .
 
-QT += widgets core qml network
+QT += widgets core qml network webview
 
 # Input
 SOURCES += main.cpp \

@@ -6,11 +6,15 @@ import QtQuick 2.15
 import "./" as Custom
 
 Rectangle{
+    function setCharAt(str,index,chr) {
+        if(index > str.length-1) return str;
+        return str.substring(0,index) + chr + str.substring(index+1);
+    }
     function decade(year){
             var begin = year;
-            begin=begin.replace(year[3],'0')
+            begin = setCharAt(begin,3,'0');
             var end = year
-            end=end.replace(year[3],'9')
+            end = setCharAt(end,3,'9');
             return begin+"-"+end;
         }
     function getFirst(years){
@@ -21,17 +25,37 @@ Rectangle{
         return spec.replace(/\+/g, '%20');
     }
 
+    function openUrl(url){
+        browserWindow.visible = true;
+        browser.url = url;
+    }
+
+    function shorter(prefix, country){
+        var pre = prefix+(prefix.length>0?" ":"");
+        if(country.length < 16){
+            return pre + country;
+        } else if(country.length < 27 && pre.length === 0){
+            return country;
+        }else if(pre.length === 0) {
+            return country.slice(0,25)+"..";
+        } else {
+            return prefix;
+        }
+    }
+
     RowLayout{
         anchors.fill: parent
         spacing: 5
         anchors.margins: 3
         Button{
             text: "SW"
-            onClicked: Qt.openUrlExternally("https://www.stampworld.com/ru/maps")
             visible: !yearArea.visible
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+
+            onClicked: browserWindow.visible = true;
+
         }
         Rectangle{
             id: yearArea
@@ -39,6 +63,7 @@ Rectangle{
             color: "white"
             Layout.minimumWidth: 200
             Layout.fillHeight: true
+            Layout.fillWidth: true;
             TextEdit{
                 id: yearEdit
                 anchors.fill: parent
@@ -52,16 +77,17 @@ Rectangle{
             }
         }
         Button{
-            text: catalogue.countriesFilter[0]
+            text: shorter("", catalogue.countriesFilter[0])
             visible: (catalogue.countriesFilter.length === 1) && !gotoSeries.visible
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+            Layout.fillWidth: true;
 
             TapHandler {
                 gesturePolicy: TapHandler.ReleaseWithinBounds
                 onTapped: {
-                    Qt.openUrlExternally("https://www.stampworld.com/ru/stamps/"+catalogue.countriesFilter[0]+
+                   openUrl("https://www.stampworld.com/ru/stamps/"+catalogue.countriesFilter[0]+
                                          (yearArea.visible?("/Postage%20stamps/"+
                                                             decade(yearEdit.text)+"?year="+yearEdit.text):""))
                 }
@@ -73,16 +99,17 @@ Rectangle{
         }
 
         Button{
-            text: "My "+catalogue.countriesFilter[0]
+            text: shorter("My",catalogue.countriesFilter[0])
             visible: (catalogue.countriesFilter.length === 1) && !gotoSeries.visible
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+            Layout.fillWidth: true;
 
             TapHandler {
                 gesturePolicy: TapHandler.ReleaseWithinBounds
                 onTapped: {
-                    Qt.openUrlExternally("https://www.stampworld.com/ru/stamps/"+catalogue.countriesFilter[0]+"/?view=mycatalogue&user=383347&cid=164812"+
+                    openUrl("https://www.stampworld.com/ru/stamps/"+catalogue.countriesFilter[0]+"/?view=mycatalogue&user=383347&cid=164812"+
                                          (yearArea.visible?("&year="+yearEdit.text):""))
                 }
                 onLongPressed: {
@@ -91,16 +118,17 @@ Rectangle{
             }
         }
         Button{
-            text: "Wish "+catalogue.countriesFilter[0]
+            text: shorter("Wish", catalogue.countriesFilter[0])
             visible: (catalogue.countriesFilter.length === 1) && !gotoSeries.visible
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+            Layout.fillWidth: true;
 
             TapHandler {
                 gesturePolicy: TapHandler.ReleaseWithinBounds
                 onTapped: {
-                    Qt.openUrlExternally("https://www.stampworld.com/ru/stamps/"+catalogue.countriesFilter[0]+"/?view=wanted&user=383347"+
+                    openUrl("https://www.stampworld.com/ru/stamps/"+catalogue.countriesFilter[0]+"/?view=wanted&user=383347"+
                                          (yearArea.visible?("&year="+yearEdit.text):""))
                 }
                 onLongPressed: {
@@ -110,14 +138,15 @@ Rectangle{
         }
         Button{
             id: gotoYear
-            text: content.country+": "+getFirst(content.year)
+            text: shorter("", content.country)+": "+getFirst(content.year)
             visible: content.stampView
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+            Layout.fillWidth: true;
 
             onClicked: {
-                Qt.openUrlExternally("https://www.stampworld.com/ru/stamps/"+content.country+"/"+
+                openUrl("https://www.stampworld.com/ru/stamps/"+content.country+"/"+
                                     ((content.spec=="default")?"Postage%20stamps":getSpec(content.spec))+"/"+
                                                         decade(getFirst(content.year))+
                                                         "&year="+getFirst(content.year))
@@ -125,14 +154,15 @@ Rectangle{
         }
         Button{
             id: gotoOwned
-            text: "My "+content.country
+            text: shorter("My", content.country)
             visible: content.stampView
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+            Layout.fillWidth: true;
 
             onClicked: {
-                Qt.openUrlExternally("https://www.stampworld.com/ru/stamps/"+
+                openUrl("https://www.stampworld.com/ru/stamps/"+
                                      content.country+
                                      ((content.spec=="default")?"":("/"+getSpec(content.spec)))
                                      +"?view=mycatalogue&user=383347&cid=164812"+
@@ -146,9 +176,10 @@ Rectangle{
             Layout.fillHeight: true
             font.bold: true
             font.pointSize: 16
+            Layout.fillWidth: true;
 
             onClicked: {
-                Qt.openUrlExternally(content.seriesLink)
+                openUrl(content.seriesLink)
             }
 
             onVisibleChanged: {

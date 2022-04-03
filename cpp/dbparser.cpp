@@ -210,13 +210,13 @@ QJsonDocument AddParamsToJson(const db::Catalogue& db){
 }
 
 
-QString SerializeAddData(const db::Catalogue &db)
+QString SerializeUserData(const db::Catalogue &db)
 {
   const auto& json = AddParamsToJson(db);
   return QString::fromUtf8(json.toJson());
 }
 
-void ParseAddData(const QString& str, db::Catalogue& db){
+void ParseUserData(const QString& str, db::Catalogue& db){
   QJsonDocument json = QJsonDocument::fromJson(str.toUtf8());
   if(!json.isArray())
     throw std::runtime_error{"Global add data value is not an array"};

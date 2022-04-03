@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QtGlobal>
 #include <QSslSocket>
+#include <QtWebView>
 
 #include "datamanager.h"
 #include "catalogue.h"
@@ -14,6 +15,8 @@ int main(int argc, char* argv[]) {
     qInfo() << "Device supports OpenSSL: " << QSslSocket::supportsSsl();
 
 	QApplication a(argc, argv);
+
+	QtWebView::initialize();
 
 	try {
 	  DataManager db{};

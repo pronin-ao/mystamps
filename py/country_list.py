@@ -10,6 +10,7 @@ EUROPA = [
     'DDR',
     'Germany',
     'German-Empire',
+    'Berlin',
     'Bohemia-and-Moravia',
     'Greece',
     'Denmark',
@@ -49,36 +50,53 @@ EUROPA = [
     'Kosovo',   # !
     'Saar',
     'Saargebiet',  # !
+    'Saxony',
+    'Cyprus-(Greek)',
+    'UN-Vienna',
+    'UN-Geneva',
+    'Tannu-Touva',
+    'Georgia',
 ]
 
 AFRICA = [
     'UAR',
+    'Angola',
     'Belgian-Congo',  # !
     'Benin',
+    'Botswana',
+    'Bechuanaland-Protectorate',
     'French-West-Africa',
     'Ivory-Coast',
     'Burkina-Faso',
     'Upper-Volta',
     'Burundi',
+    'Cape-Juby',
+    'Spanish-Morocco',
+    'Spanish-Sahara',
     'Gabon',
+    'Gambia',
     'Ghana',
     'Guinea',
     'Guinea-Bissau',
     'Djibouti',
+    'Dahomey',
     'French-Somali-Coast',
     'Zambia',
     'Northern-Rhodesia',
     'Zimbabwe',
     'Southern-Rhodesia',
+    'Rhodesia-and-Nyasaland',
     'Cameroon',
     'Comoro-Islands',
     'Congo,-Dr',
     'Congo,-Rep.',
     'Lesotho',
+    'Basutoland',
     'Liberia',
     'Mauritius',
     'Madagascar',
     'Malawi',
+    'Nyasaland',
     'Mali',
     'Mozambique',
     'Mozambique-Company',
@@ -90,6 +108,7 @@ AFRICA = [
     'Sierra-Leone',
     'Tanzania',
     'Kenya,-Uganda-and-Tanganyika',
+    'Kenya',
     'Togo',
     'Uganda',
     'Chad',
@@ -101,12 +120,18 @@ AFRICA = [
     'Belgian-Occ.-of-German-East-Africa',  # !
     'Seychelles',
     'Tunisia',
+    'Gold-Coast',
+    'Swaziland',
 ]
 
 NORTH_AMERICA = [
     'Antigua',
     'Antigua-And-Barbuda',
+    'Bahamas',
+    'Barbados',
     'Barbuda',
+    'Bermuda',
+    'Cayman-Islands',
     'New-Brunswick',
     'Newfoundland',
     'Guatemala',
@@ -134,6 +159,10 @@ NORTH_AMERICA = [
     'United-States',  # !
     'Jamaica',
     'Trinidad-And-Tobago',
+    'British-Virgin-Islands',
+    'Montserrat',
+    'Turks-And-Caicos-Islands',
+    'UN-New-York',
 ]
 
 SOUTH_AMERICA = [
@@ -169,7 +198,22 @@ ASIA = [
     'Taiwan',
     'East-China',
     'Northeast-China',
+    'South-China',
     'China,-Empire',
+    'Kirin-Heilungkiang',
+    'Macau',
+    'Manchukuo',
+    'Port-Arthur-and-Dairen',
+    'North-China',
+    'Northwest-China',
+    'Central-China',
+    'Southwest-China',
+    'Shanghai',
+    'Sinkiang',
+    'Szechwan',
+    'Fukien',
+    'Hupeh',
+    'Yunnan',
     'Kyrgyzstan',
     'Laos',
     'Malaysia',
@@ -197,7 +241,11 @@ ASIA = [
     'Uzbekistan',
     'Jordan',
     'Indochina',
-    'Hong-Kong'
+    'Hong-Kong',
+    'South-Korea',
+    'Selangor',
+    'Trengganu',
+    'Nejd',
 ]
 
 AUSTRALIA = [
@@ -217,6 +265,11 @@ AUSTRALIA = [
     'Nui',
     'Nukufetau',
     'Nukulaelae',
+    'Nauru',
+    'Cook-Islands',
+    'Palau',
+    'Solomon-Islands',
+    'Fiji'
 ]
 
 FULL_COUNTRIES = []
@@ -237,7 +290,14 @@ CATEGORIES_SETTINGS = {
     'Belgium': ['Railway+parcelpost+stamps', 'Parcel+post+stamps'],
     'United-States': ['Parcel+post+stamps'],
     'France': ['Parcel+post+stamps'],
-    'Monaco': ['Postage-due+stamp'],
+    'Monaco': ['Postage-due+stamps'],
     'Bolivia': ['Postal+tax+stamps'],
-    'North-Vietnam': ['Military+stamps']
+    'North-Vietnam': ['Military+stamps'],
+    'North-China': ['Parcel+post'],
+    'Southwest-China': ['Parcel+post'],
+    'Northeast-China': ['Parcel+post'],
+    'Mexico': ['Parcel+post+stamps'],
+    'Honduras': ['Official+stamps'],
+    'Nejd': ['Postage+due+stamps'],
+    'Dahomey': ['Postage+due+stamps'],
 }

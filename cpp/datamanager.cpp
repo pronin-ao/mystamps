@@ -46,7 +46,7 @@ DataManager::DataManager(QObject *parent) : QObject(parent)
   _db = ParseCatalogue(json);
   collectAllFilters();
   const auto& add_json = ReadFile(Datafile);
-  ParseAddData(add_json, _db);
+  ParseUserData(add_json, _db);
 }
 
 void DataManager::setCatalogue(Catalogue *catalogue)
@@ -135,7 +135,7 @@ void DataManager::filterPriceForYears()
 
 void DataManager::saveAddToFile()
 {
-  const auto& new_data = SerializeAddData(_db);
+  const auto& new_data = SerializeUserData(_db);
   QFile file;
   file.setFileName(Datafile);
   file.open(QIODevice::WriteOnly | QIODevice::Text);

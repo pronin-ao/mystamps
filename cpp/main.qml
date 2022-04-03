@@ -2,6 +2,7 @@ import QtQuick 2.3
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import QtWebView 1.15
 
 import mystamps.data 1.0
 
@@ -80,6 +81,61 @@ Window{
         anchors.bottom: parent.bottom
         color: "darkgrey"
     }
+
+    Rectangle{
+        id: browserWindow
+        visible: false
+        anchors.fill: parent
+        color: "#4488ff"
+
+        ColumnLayout{
+            anchors.fill: parent
+            spacing: 5
+            anchors.margins: 3
+
+            RowLayout{
+                Layout.fillWidth: true
+                spacing: 3
+                anchors.margins: 2
+
+                Button{
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 100
+                    font.bold: true
+                    font.pointSize: 16
+                    text: "<<<"
+                    onClicked: browser.goBack();
+                }
+
+                Button{
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 100
+                    font.bold: true
+                    font.pointSize: 16
+                    text: "CLOSE"
+                    onClicked: browserWindow.visible = false;
+                }
+                Button{
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 100
+                    font.bold: true
+                    font.pointSize: 16
+                    text: ">>>"
+                    onClicked: browser.goForward();
+                }
+            }
+
+
+            WebView {
+                id: browser
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                url: "https://www.stampworld.com/ru/maps"
+            }
+        }
+    }
+
+
 
 
 }

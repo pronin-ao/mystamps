@@ -128,4 +128,11 @@ Rectangle {
         visible: false
         anchors.fill: parent
     }
+
+    function setDefaultView() {
+        showStamp.visible = false;
+        grid.visible = true;
+    }
+
+
 }

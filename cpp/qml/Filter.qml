@@ -2,13 +2,8 @@ import QtQuick 2.6
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-
 Rectangle{
     id: root
-    color: "#3300ff00"
-    width: parent.width
-    height: parent.height - menu.height
-    anchors.top: menu.bottom
     property var filterModel: []
     property var filtered: []
 
@@ -81,16 +76,34 @@ Rectangle{
                 root.apply(filtered)
                 filter.visible = false;
                 content.visible = true;
+                content.setDefaultView();
             }
+        }
+    }
+
+    Button {
+        id: clear
+        anchors.top: result.bottom
+        anchors.left: parent.left
+        height: parent.height / 16
+        width: parent.width/10
+        text:  "X"
+        background: Rectangle {
+            color: "#ff6655"
+        }
+
+        onClicked: {
+            search.text = ""
         }
     }
 
     TextEdit{
         id: search
         anchors.top: result.bottom
-        anchors.left: parent.left
+        anchors.left: clear.right
         height: parent.height / 16
-        width: parent.width*0.9
+        width: parent.width*0.8
+        inputMethodHints: Qt.ImhUrlCharactersOnly
     }
 
     Button {

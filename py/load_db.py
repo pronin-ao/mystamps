@@ -13,7 +13,7 @@ URL = 'https://www.stampworld.com'
 LINK = URL + '/ru/stamps/COUNTRY/?view=wanted&user=383347'
 MAIN = '&cid=164812'
 # div[2]/div[1]/div/a
-SERIES_PATH = '/html/body/div[1]/div/div[2]/div/div[1]/div/div[4]/div'
+SERIES_PATH = '/html/body/div[2]/div/div[2]/div/div[1]/div/div[4]/div'
 NUMBER_PATH = 'div[3]/table/tbody/tr/th/a/text()'
 TYPE_PATH = 'div[3]/table/tbody/tr/td[1]/a'
 PRICE_PATH = 'div[3]/table/tbody/tr/td[2]/text()'

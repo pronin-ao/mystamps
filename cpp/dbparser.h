@@ -6,6 +6,6 @@
 db::Catalogue ParseCatalogue(const QString &str);
 
 
-QString SerializeAddData(const db::Catalogue& db);
+QString SerializeUserData(const db::Catalogue& db);
 
-void ParseAddData(const QString& str, db::Catalogue& data);
+void ParseUserData(const QString& str, db::Catalogue& data);
