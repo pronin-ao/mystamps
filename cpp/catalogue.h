@@ -1,174 +1,70 @@
 #pragma once
 #include <QObject>
+#include <QSharedPointer>
 #include <QStringList>
 #include <qqml.h>
 
+#include "catalogue_constants.h"
+#include "stamp.h"
 
-class Stamp {
-  Q_GADGET
-  Q_PROPERTY(QString capture READ capture)
-  Q_PROPERTY(QString image READ image)
-  Q_PROPERTY(QString price READ price)
-  Q_PROPERTY(QString year READ year)
-  Q_PROPERTY(QString country READ country)
-  Q_PROPERTY(QString spec READ spec)
-  Q_PROPERTY(bool checked READ checked WRITE setChecked)
-  Q_PROPERTY(QString id READ id)
-  Q_PROPERTY(QString code READ code)
-  Q_PROPERTY(QString color READ color)
-  Q_PROPERTY(QString series READ series)
-  Q_PROPERTY(bool owned READ owned)
-  Q_PROPERTY(QStringList conditions READ conditions)
-  Q_PROPERTY(QString sw_link READ sw_link)
-  Q_PROPERTY(bool has_list READ has_list)
-  Q_PROPERTY(QString list_note READ list_note)
-  Q_PROPERTY(bool list_owned READ list_owned)
-  Q_PROPERTY(QStringList list_conditions READ list_conditions)
-
-public:
-  inline auto capture() const {return _capture;}
-  inline auto image() const {return _image;}
-  inline auto price() const {return _price;}
-  inline auto year() const {return _year;}
-  inline auto country() const {return _country;}
-  inline auto spec() const {return _spec;}
-  inline auto checked() const {return _checked;}
-  inline auto id() const {return _id;}
-  inline auto code() const {return _code;}
-  inline auto color() const {return _color;}
-  inline auto series() const {return _series;}
-  inline auto owned() const {return _owned;}
-  inline auto conditions() const {return _conditions;}
-  inline auto sw_link() const {return _sw_link;}
-  inline auto has_list() const {return _has_list;}
-  inline auto list_note() const {return _list_note;}
-  inline auto list_owned() const {return _list_owned;}
-  inline auto list_conditions() const {return _list_conditions;}
-
-
-  void setChecked(const bool checked);
-
-  QString _capture;
-  QString _image;
-  QString _price;
-  QString _year;
-  QString _country;
-  QString _spec;
-  bool _checked = false;
-  QString _id;
-  QString _code;
-  QString _color;
-  QString _series;
-  bool _owned;
-  QStringList _conditions;
-  QString _sw_link;
-  bool _has_list;
-  QString _list_note;
-  bool _list_owned;
-  QStringList _list_conditions;
-};
-
-namespace sorting {
-  const QString kYear = "year";
-  const QString kCountry = "country";
-  const QString kPrice = "price";
-  const QString kSeries = "series";
-}
-
-namespace filters {
-  const QString kCountries = "countries";
-}
-namespace order {
-  const QString kRaise = "raise";
-  const QString kFall = "fall";
-
-}
-
-namespace show {
-  const QString kAll = "all";
-  const QString kOwned = "owned";
-  const QString kWishlist = "wishlist";
-}
-
-
-class Catalogue : public QObject
-{
+class Catalogue : public QObject {
   Q_OBJECT
-  Q_PROPERTY(QStringList years  READ years WRITE setYears NOTIFY yearsChanged)
-  Q_PROPERTY(QStringList countries
-             READ countries WRITE setCountries NOTIFY countriesChanged)
+  Q_PROPERTY(QStringList years READ years WRITE setYears NOTIFY yearsChanged)
+  Q_PROPERTY(QStringList countries READ countries WRITE setCountries NOTIFY
+                 countriesChanged)
   Q_PROPERTY(QStringList yearsFilter READ yearsFilter WRITE setYearsFilter)
-  Q_PROPERTY(QStringList countriesFilter READ countriesFilter WRITE setCountriesFilter NOTIFY countriesFilterChanged)
+  Q_PROPERTY(QStringList countriesFilter READ countriesFilter WRITE
+                 setCountriesFilter NOTIFY countriesFilterChanged)
   Q_PROPERTY(QVariantList stamps READ stamps NOTIFY stampsUpdated)
   Q_PROPERTY(QString sorting READ sorting NOTIFY sortingChanged)
   Q_PROPERTY(QString order READ order NOTIFY orderChanged)
   Q_PROPERTY(QStringList priceFilter READ priceFilter WRITE setPriceFilter)
-  Q_PROPERTY(QStringList prices
-             READ prices WRITE setPrices NOTIFY pricesChanged)
+  Q_PROPERTY(
+      QStringList prices READ prices WRITE setPrices NOTIFY pricesChanged)
   Q_PROPERTY(QString showMode READ showMode WRITE applyShowMode)
 
   QML_ELEMENT
 
 public:
   explicit Catalogue(QObject *parent = nullptr);
-  inline auto years() const {
-    return  _years;
-  }
-  inline auto countries() const {
-    return _countries;
-  }
-  inline auto prices() const {
-    return _prices;
-  }
-  inline auto yearsFilter() const {
-    return _yearsFilter;
-  }
-  inline auto countriesFilter() const {
-    return _countriesFilter;
-  }
-  inline auto priceFilter() const  {
-    return _priceFilter;
-  }
-  inline auto showMode() const  {
-    return _showMode;
-  }
-  inline auto stamps() const {
-    return _stamps;
-  }
-  inline auto sorting() const{
-    return _sorting;
-  }
-  inline auto order() const {
-    return _order;
-  }
-  void setStamps(QVariantList&& stamps);
+  inline auto years() const { return *_years; }
+  inline auto countries() const { return *_countries; }
+  inline auto prices() const { return *_prices; }
+  inline auto yearsFilter() const { return _yearsFilter; }
+  inline auto countriesFilter() const { return _countriesFilter; }
+  inline auto priceFilter() const { return _priceFilter; }
+  inline auto showMode() const { return _showMode; }
+  inline auto stamps() const { return *_stamps; }
+  inline auto sorting() const { return _sorting; }
+  inline auto order() const { return _order; }
 
 public slots:
-  void setYears(QStringList&& years);
-  void setYears(const QStringList& years);
+  void setStamps(QSharedPointer<QVariantList> stamps);
 
-  void setCountries(QStringList&& countries);
-  void setCountries(const QStringList& countries);
+  void setYears(QSharedPointer<QStringList> years);
+  void setYears(const QStringList &years);
 
-  void setPrices(QStringList&& prices);
-  void setPrices(const QStringList& prices);
+  void setCountries(QSharedPointer<QStringList> countries);
+  void setCountries(const QStringList &countries);
 
-  void setCountriesFilter(const QStringList& filter);
-  void setYearsFilter(const QStringList& filter);
-  void setPriceFilter(const QStringList& filter);
+  void setPrices(QSharedPointer<QStringList> prices);
+  void setPrices(const QStringList &prices);
 
-  void applyCountriesFilter(const QStringList& filter);
-  void applyYearFilter(const QStringList& filter);
-  void applyPriceFilter(const QStringList& filter);
-  void applyShowMode(const QString& showMode);
+  void setCountriesFilter(const QStringList &filter);
+  void setYearsFilter(const QStringList &filter);
+  void setPriceFilter(const QStringList &filter);
 
-  void applySort(const QString& sort_type);
-  void applyOrder(const QString& sort_order);
+  void applyCountriesFilter(const QStringList &filter);
+  void applyYearFilter(const QStringList &filter);
+  void applyPriceFilter(const QStringList &filter);
+  void applyShowMode(const QString &showMode);
 
-  void checkStamp(const Stamp& stamp);
+  void applySort(const QString &sort_type);
+  void applyOrder(const QString &sort_order);
+
+  void checkStamp(const Stamp &stamp);
 
   void filter(QString text, QString filterType);
-
 
 signals:
   void yearsChanged();
@@ -177,24 +73,25 @@ signals:
 
   void stampsUpdated();
 
-  void sendCountriesFilter(const QStringList&);
-  void sendYearsFilter(const QStringList&);
-  void sendPriceFilter(const QStringList&);
-  void sendShowMode(const QString&);
+  void sendCountriesFilter(const QStringList &);
+  void sendYearsFilter(const QStringList &);
+  void sendPriceFilter(const QStringList &);
+  void sendShowMode(const QString &);
 
   void dataChanged();
   void sortingChanged();
   void orderChanged();
 
-  void stampChanges(const Stamp&);
+  void stampChanges(const Stamp &);
 
-  void getFilter(const QStringList& list);
+  void getFilter(const QStringList &list);
   void countriesFilterChanged();
 
 private:
-  QStringList _years = {};
-  QStringList _countries = {};
-  QStringList _prices = {};
+  QSharedPointer<QStringList> _years = QSharedPointer<QStringList>::create();
+  QSharedPointer<QStringList> _countries =
+      QSharedPointer<QStringList>::create();
+  QSharedPointer<QStringList> _prices = QSharedPointer<QStringList>::create();
 
   QStringList _fullYears = {};
   QStringList _fullCountries = {};
@@ -205,9 +102,9 @@ private:
   QStringList _priceFilter = {};
   QString _showMode = show::kAll;
 
-  QVariantList _stamps = {};
+  QSharedPointer<QVariantList> _stamps =
+      QSharedPointer<QVariantList>::create(QVariantList{});
 
   QString _sorting = sorting::kYear;
-  QString _order= order::kRaise;
+  QString _order = order::kRaise;
 };
-
