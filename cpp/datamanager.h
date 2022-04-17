@@ -14,6 +14,7 @@ public:
   explicit DataManager(QObject *parent = nullptr);
 
   void initiateDataForQml();
+  void initiateDataForAdmin();
 
 public slots:
   void applyCountriesFilter(const QStringList &filter);
@@ -22,6 +23,8 @@ public slots:
   void applyShowMode(const QString &showMode);
 
   void registerStampChecked(const Stamp &stamp);
+
+  void saveCustomData() const;
 
 private:
   db::Catalogue _db;
@@ -49,4 +52,5 @@ signals:
   void sendPricesFilter(const QStringList &);
   void sendPrices(QSharedPointer<QStringList>);
   void sendStamps(QSharedPointer<QVariantList>);
+  void sendDbPointer(db::Catalogue *db);
 };

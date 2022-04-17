@@ -9,7 +9,8 @@
 #include "datamanager.h"
 
 #if defined(Q_OS_LINUX)
-
+#define MAKE_ADMIN
+#include "admin.h"
 #endif
 
 int main(int argc, char *argv[]) {
@@ -67,8 +68,18 @@ int main(int argc, char *argv[]) {
     // set data to catalogue (once)
     QObject::connect(&db, &DataManager::sendStamps, catalogue,
                      &Catalogue::setStamps);
-
     db.initiateDataForQml();
+
+    // admin if needed
+#ifdef MAKE_ADMIN
+    Admin admin;
+    admin.show();
+    QObject::connect(&db, &DataManager::sendDbPointer, &admin,
+                     &Admin::setDbPointerToModel);
+    QObject::connect(&admin, &Admin::dataChanged, &db,
+                     &DataManager::saveCustomData);
+    db.initiateDataForAdmin();
+#endif // MAKE_ADMIN
     return a.exec();
   } catch (const std::exception &ex) {
     QMessageBox::critical(nullptr, "Error loading DB",

@@ -8,10 +8,12 @@
 
 #if defined(Q_OS_ANDROID)
 const QString dbFilename = "/sdcard/stamps/stamp_base.json";
-const QString Datafile = "/sdcard/stamps/mystamps-data.json";
+const QString UserDataFile = "/sdcard/stamps//user_data.json";
+const QString CustomDataFile = "/sdcard/stamps//custom_data.json";
 #elif defined(Q_OS_LINUX)
 const QString dbFilename = "../stamp_base.json";
-const QString Datafile = "../mystamps-data.json";
+const QString UserDataFile = "../user_data.json";
+const QString CustomDataFile = "../custom_data.json";
 #endif
 
 QString ReadFile(const QString &filename) {
@@ -36,10 +38,13 @@ QStringList QStringListFromSet(const std::set<std::string> &set) {
 
 DataManager::DataManager(QObject *parent) : QObject(parent) {
   const auto &json = ReadFile(dbFilename);
-  _db = ParseCatalogue(json);
+  _db = ParseStampworldCatalogue(json);
   collectAllFilters();
-  const auto &add_json = ReadFile(Datafile);
-  ParseUserData(add_json, _db);
+  const auto &user_json = ReadFile(UserDataFile);
+  ParseUserData(user_json, _db);
+  const auto &custom_json = ReadFile(CustomDataFile);
+  ParseCustomData(custom_json, _db);
+  emit sendDbPointer(&_db);
 }
 
 void DataManager::initiateDataForQml() {
@@ -57,6 +62,8 @@ void DataManager::initiateDataForQml() {
 
   applyPriceFilter({});
 }
+
+void DataManager::initiateDataForAdmin() { emit sendDbPointer(&_db); }
 
 void DataManager::collectAllFilters() {
   for (const auto &[country, data] : _db) {
@@ -114,7 +121,7 @@ void DataManager::filterPriceForYears() {
 void DataManager::saveAddToFile() {
   const auto &new_data = SerializeUserData(_db);
   QFile file;
-  file.setFileName(Datafile);
+  file.setFileName(UserDataFile);
   file.open(QIODevice::WriteOnly | QIODevice::Text);
   file.write(new_data.toUtf8());
   file.close();
@@ -195,17 +202,24 @@ void DataManager::applyPriceFilter(const QStringList &filter) {
                       QString::fromStdString(year),
                       QString::fromStdString(name),
                       QString::fromStdString(stamp.second.spec),
-                      stamp.second.add.checked,
+                      stamp.second.user.checked,
                       QString::fromStdString(stamp.first),
                       QString::fromStdString(stamp.second.code),
                       QString::fromStdString(stamp.second.color),
-                      QString::fromStdString(cap), stamp.second.owned,
+                      QString::fromStdString(cap),
+                      (stamp.second.owned &&
+                       (!stamp.second.custom ||
+                        !stamp.second.custom->forced_wishlist.value_or(false))),
                       std::move(conds),
                       QString::fromStdString(stamp.second.sw_link),
                       stamp.second.has_list,
                       QString::fromStdString(
                           stamp.second.list_note.value_or("")),
-                      stamp.second.list_owned.value_or(false), list_conds});
+                      stamp.second.list_owned.value_or(false), list_conds,
+                      QString::fromStdString(
+                          stamp.second.custom
+                              ? stamp.second.custom->comments.value_or("")
+                              : "")});
                   return var;
                 });
           }
@@ -224,6 +238,15 @@ void DataManager::applyShowMode(const QString &showMode) {
 void DataManager::registerStampChecked(const Stamp &st) {
   _db[st._country.toStdString()][st._year.toStdString()]
      [st._series.toStdString()][st._id.toStdString()]
-         .add.checked = st._checked;
+         .user.checked = st._checked;
   saveAddToFile();
+}
+
+void DataManager::saveCustomData() const {
+  const auto &new_data = SerializeCustomData(_db);
+  QFile file;
+  file.setFileName(CustomDataFile);
+  file.open(QIODevice::WriteOnly | QIODevice::Text);
+  file.write(new_data.toUtf8());
+  file.close();
 }

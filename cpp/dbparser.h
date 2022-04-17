@@ -3,8 +3,10 @@
 #include "dbmodel.h"
 #include <QString>
 
-db::Catalogue ParseCatalogue(const QString &str);
+db::Catalogue ParseStampworldCatalogue(const QString &str);
 
 QString SerializeUserData(const db::Catalogue &db);
+void ParseUserData(const QString &str, db::Catalogue &db);
 
-void ParseUserData(const QString &str, db::Catalogue &data);
+QString SerializeCustomData(const db::Catalogue &db);
+void ParseCustomData(const QString &str, db::Catalogue &db);

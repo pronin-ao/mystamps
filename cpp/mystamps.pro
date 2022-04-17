@@ -6,19 +6,25 @@ QT += widgets core qml network webview
 
 # Input
 SOURCES += main.cpp \
-    admin.cpp \
+    adminmodel.cpp \
+    adminproxymodel.cpp \
     catalogue.cpp \
     datamanager.cpp \
-    dbparser.cpp
+    dbparser.cpp \
+    delegates.cpp \
+    urlimagelabel.cpp
 
 HEADERS += \
-    admin.h \
+    adminmodel.h \
+    adminproxymodel.h \
     catalogue.h \
     catalogue_constants.h \
     datamanager.h \
     dbmodel.h \
     dbparser.h \
-    stamp.h
+    delegates.h \
+    stamp.h \
+    urlimagelabel.h
 
 RESOURCES += \
     res.qrc
@@ -34,7 +40,16 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 android: include(/home/pronin-ao/openssl/android_openssl/openssl.pri)
 
-FORMS += \
-    admin.ui
+linux: {
+    FORMS += \
+        admin.ui
+    SOURCES += \
+        admin.cpp
+    HEADERS += \
+        admin.h
+    QTWEBENGINE_CHROMIUM_FLAGS=--ignore-gpu-blacklist
+}
+
+
 
 

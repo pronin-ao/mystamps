@@ -92,8 +92,8 @@ Rectangle {
                 }
                 Text{
                     anchors.fill: parent
-                    visible: modelData.owned
-                    color: "#bb3300"
+                    visible:  modelData.conditions.lenght !== 0 || modelData.list_owned
+                    color: modelData.owned ? "#ff3311" : "#22ff22"
                     font.bold: true
                     font.pointSize: 18
 
@@ -113,6 +113,17 @@ Rectangle {
                         (modelData.has_list?(modelData.list_owned?"LIST":modelData.list_note):"")
                     }
 
+                }
+                Text{
+                    visible: modelData.comments !== ""
+                    text: "(!)"
+                    horizontalAlignment: Qt.AlignRight
+                    color: "#dd22ee"
+                    font.bold: true
+                    font.pointSize: 18
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    width: parent.width/2
                 }
 
             }

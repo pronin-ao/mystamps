@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 
 Rectangle{
     id: showStamp
-    color: "#202020"
+    color: "#101010"
     property var stampData
     Text{
         id: topText
@@ -29,17 +29,19 @@ Rectangle{
         width: parent.width
         fillMode: Image.PreserveAspectFit
         Text{
-            visible: {parent.source == ""}
+            visible: true
             anchors.fill: parent
-            text: {
-                 showStamp.stampData.country + ", \t" +
+            text: (parent.source == "")
+                  ?(showStamp.stampData.country + ", \t" +
                  showStamp.stampData.year + "\n" +
                  showStamp.stampData.color + ", \t" +
-                 showStamp.stampData.price
-            }
+                 showStamp.stampData.price + "\n\n" +
+                 showStamp.stampData.comments)
+                 : showStamp.stampData.comments
+
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            color: "#cccccc"
+            color: "#777777"
         }
     }
     Text{
@@ -56,7 +58,7 @@ Rectangle{
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-    }
+    }   
 
     TapHandler {
         onLongPressed: {

@@ -6,8 +6,15 @@
 
 namespace db {
 
-struct AddParams {
+struct UserParams {
   bool checked = false;
+};
+
+struct CustomParams {
+  std::optional<bool> forced_wishlist = std::nullopt;
+  std::optional<std::string> comments = std::nullopt;
+
+  inline bool has_value() { return forced_wishlist || comments; }
 };
 
 using Image = std::string;
@@ -36,7 +43,8 @@ struct Stamp {
   std::optional<bool> list_owned;
   std::optional<Conditions> list_conditions;
 
-  AddParams add{};
+  UserParams user{};
+  std::optional<CustomParams> custom{};
 };
 using Series = std::unordered_map<Number, Stamp>;
 using SeriesName = std::string;

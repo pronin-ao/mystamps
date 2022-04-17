@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QStringList>
 
+#include <QDebug>
+
 class Stamp {
   Q_GADGET
   Q_PROPERTY(QString capture READ capture)
@@ -24,6 +26,7 @@ class Stamp {
   Q_PROPERTY(QString list_note READ list_note)
   Q_PROPERTY(bool list_owned READ list_owned)
   Q_PROPERTY(QStringList list_conditions READ list_conditions)
+  Q_PROPERTY(QString comments READ comments)
 
 public:
   inline auto capture() const { return _capture; }
@@ -44,6 +47,7 @@ public:
   inline auto list_note() const { return _list_note; }
   inline auto list_owned() const { return _list_owned; }
   inline auto list_conditions() const { return _list_conditions; }
+  inline auto comments() const { return _comments; }
 
   void setChecked(const bool checked);
 
@@ -65,6 +69,7 @@ public:
   QString _list_note;
   bool _list_owned;
   QStringList _list_conditions;
+  QString _comments;
 };
 
 #endif // STAMP_H
