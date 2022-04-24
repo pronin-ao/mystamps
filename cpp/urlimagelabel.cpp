@@ -5,8 +5,21 @@
 UrlImageLabel::UrlImageLabel(const QString &url, QNetworkAccessManager *network,
                              QWidget *parent)
     : QLabel(parent), _network(network) {
-  const auto response = _network->get(QNetworkRequest(QUrl(url)));
-  connect(response, &QNetworkReply::finished, this,
+  setUrl(url);
+}
+
+void UrlImageLabel::setUrl(const QString &url) {
+  if (_url == url) {
+    qDebug() << url;
+    return;
+  }
+  _url = url;
+  if (_response) {
+    _response->close();
+    _response->disconnect(this);
+  }
+  _response = _network->get(QNetworkRequest(QUrl(url)));
+  connect(_response, &QNetworkReply::finished, this,
           &UrlImageLabel::imageLoaded);
 }
 
@@ -27,6 +40,8 @@ void UrlImageLabel::leaveEvent(QEvent *) {
 }
 
 void UrlImageLabel::imageLoaded() {
+  if (_response == sender())
+    _response = nullptr;
   QByteArray jpegData = qobject_cast<QNetworkReply *>(sender())->readAll();
   sender()->deleteLater();
   QPixmap pixmap;

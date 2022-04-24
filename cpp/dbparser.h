@@ -10,3 +10,6 @@ void ParseUserData(const QString &str, db::Catalogue &db);
 
 QString SerializeCustomData(const db::Catalogue &db);
 void ParseCustomData(const QString &str, db::Catalogue &db);
+
+QString SerializeImagesData(const db::Catalogue &db);
+void ParseImagesData(const QString &str, db::Catalogue &db);

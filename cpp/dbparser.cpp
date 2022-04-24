@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
+#include "data_constants.h"
+
 namespace names {
 const QString kCountry = "country";
 const QString kSeries = "series";
@@ -278,6 +280,49 @@ void ParseCustomData(const QString &str, db::Catalogue &db) {
         data->comments = stamp[names::kComments].toString().toStdString();
     } catch (const std::out_of_range &err) {
       // qDebug() << "Skipping a stamp "<<stamp;
+    }
+  }
+}
+
+QString SerializeImagesData(const db::Catalogue &db) {
+  QJsonArray res;
+  for (const auto &[country, country_data] : db)
+    for (const auto &[year, year_data] : country_data)
+      for (const auto &[series, series_data] : year_data)
+        for (const auto &[id, stamp_data] : series_data) {
+          if (stamp_data.imageSource() != db::ImageSources::kPhoto)
+            continue;
+          const auto &data = *stamp_data.custom;
+          QJsonObject stamp;
+          stamp[names::kCountry] = QString::fromStdString(country);
+          stamp[names::kYear] = QString::fromStdString(year);
+          stamp[names::kSeries] = QString::fromStdString(series);
+          stamp[names::kId] = QString::fromStdString(id);
+          stamp[names::kImage] = QString::fromStdString(stamp_data.image);
+          res.append(stamp);
+        }
+  return QString::fromUtf8(QJsonDocument(res).toJson());
+}
+
+void ParseImagesData(const QString &str, db::Catalogue &db) {
+  QJsonDocument json = QJsonDocument::fromJson(str.toUtf8());
+  if (json.isEmpty())
+    return;
+  if (!json.isArray())
+    throw std::runtime_error{"Image data value is not an array"};
+  const auto &array = json.array();
+  for (const auto &stamp : array) {
+    try {
+      const auto &country = stamp[names::kCountry].toString().toStdString();
+      const auto &year = stamp[names::kYear].toString().toStdString();
+      const auto &series = stamp[names::kSeries].toString().toStdString();
+      const auto &id = stamp[names::kId].toString().toStdString();
+      auto &stamp_data = db.at(country).at(year).at(series).at(id);
+      if (!stamp_data.image.empty())
+        stamp_data.image_params.fallback_image = stamp_data.image;
+      stamp_data.image = stamp[names::kImage].toString().toStdString();
+    } catch (const std::out_of_range &err) {
+      qDebug() << "Skipping a stamp " << stamp;
     }
   }
 }

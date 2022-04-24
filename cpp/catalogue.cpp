@@ -1,6 +1,9 @@
 #include "catalogue.h"
 
-Catalogue::Catalogue(QObject *parent) : QObject(parent) {
+#include "data_constants.h"
+
+Catalogue::Catalogue(QObject *parent)
+    : QObject(parent), _location(paths::kLocation) {
   qRegisterMetaType<Stamp>("Stamp");
 }
 
@@ -139,6 +142,11 @@ void Catalogue::filter(QString text, QString filterType) {
   if (filterType == filters::kCountries)
     res = _fullCountries.filter(text, Qt::CaseInsensitive);
   emit getFilter(res);
+}
+
+void Catalogue::getImage(const Stamp &stamp, const QString &image_url) {
+  qDebug() << image_url;
+  emit saveImageForStamp(stamp, image_url);
 }
 
 void Catalogue::setStamps(QSharedPointer<QVariantList> stamps) {

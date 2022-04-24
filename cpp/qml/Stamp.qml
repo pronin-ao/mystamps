@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtMultimedia 5.15
 
 Rectangle{
     id: showStamp
@@ -43,22 +44,59 @@ Rectangle{
             verticalAlignment: Text.AlignVCenter
             color: "#777777"
         }
+        VideoOutput {
+            id: cameraFrame
+            source: camera
+            anchors.fill: parent
+            visible: false
+
+            MouseArea {
+                anchors.fill: parent;
+                onClicked: camera.imageCapture.captureToLocation(catalogue.location);
+            }
+
+            Camera {
+                id: camera
+                position: Camera.BackFace
+
+                imageCapture {
+                    onImageSaved: {
+                        catalogue.getImage(showStamp.stampData, path);
+                        cameraFrame.visible = false;
+                        showStamp.visible = false;
+                        grid.visible = true;
+                    }
+                }
+            }
+        }
     }
     Text{
         id: bottomText
         color: "#eeeeee"
         anchors.bottom: parent.bottom
-        width: parent.width
+        width: parent.width*9/10
         height: parent.height / 10
         text: {
             "id: " + parent.stampData.id + ":" + parent.stampData.code +
-                    " \t\t price: "+parent.stampData.price +
+                    " \t price: "+parent.stampData.price +
                     "\t " + parent.stampData.capture + "\t "+
                     "color: " + parent.stampData.color
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-    }   
+    }
+    Button{
+        id: makePhoto
+        visible:  QtMultimedia.availableCameras.length !== 0
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        width: bottomText.height
+        height: bottomText.height
+
+        onClicked: {
+            cameraFrame.visible = true;
+        }
+    }
 
     TapHandler {
         onLongPressed: {

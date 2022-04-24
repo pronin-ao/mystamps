@@ -17,6 +17,8 @@ struct CustomParams {
   inline bool has_value() { return forced_wishlist || comments; }
 };
 
+enum class ImageSources { kStampworld, kPhoto };
+
 using Image = std::string;
 using Spec = std::string;
 using Price = std::string;
@@ -27,6 +29,11 @@ using Color = std::string;
 using Conditions = std::vector<std::string>;
 using Link = std::string;
 using ListNote = std::optional<std::string>;
+
+struct ImageParams {
+  std::optional<Image> fallback_image;
+};
+
 struct Stamp {
 
   Image image = "";
@@ -45,6 +52,9 @@ struct Stamp {
 
   UserParams user{};
   std::optional<CustomParams> custom{};
+
+  ImageSources imageSource() const;
+  ImageParams image_params;
 };
 using Series = std::unordered_map<Number, Stamp>;
 using SeriesName = std::string;

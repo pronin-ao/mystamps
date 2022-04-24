@@ -30,12 +30,14 @@ private:
   QNetworkAccessManager network;
   AdminProxyModel proxyModel;
   WishlistDelegate wishListDelegate;
-  CommenstDelegate commentsDelegate;
+  CommentsDelegate commentsDelegate;
+  ImageActionDelegate imageActionDelegate;
 
   void CreateItemWidgets();
 
 signals:
-  void dataChanged();
+  void customDataChanged();
+  void imageDataChanged();
 };
 
 #endif // ADMIN_H

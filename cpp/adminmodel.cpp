@@ -37,25 +37,31 @@ QVariant AdminModel::data(const QModelIndex &index, int role) const {
     if (column == kYear)
       return {QString::fromStdString(year)};
     if (column == kSeries)
-      return {QString::fromStdString(series)};
+      return {QString::fromStdString(series).left(50)};
     if (column == kCodeNumber)
       return {QString::fromStdString("SW " + number + "/" + stamp.code)};
     if (column == kSpec)
       return {QString::fromStdString(stamp.spec)};
-
     if (column == kPrice)
       return {QString::fromStdString(stamp.price)};
     if (column == kCapture)
-      return {QString::fromStdString(stamp.capture)};
+      return {QString::fromStdString(stamp.capture).left(50)};
     if (column == kComments)
       return {QString::fromStdString(
           stamp.custom ? stamp.custom->comments.value_or("-") : "-")};
     if (column == kColor)
-      return {QString::fromStdString(stamp.color)};
+      return {QString::fromStdString(stamp.color).left(30)};
     if (column == kForcedWishlist)
       return stamp.custom
                  ? (stamp.custom->forced_wishlist.value_or(false) ? "+" : "-")
                  : "-";
+    if (column == kCustomImageAction) {
+      if (stamp.imageSource() != db::ImageSources::kPhoto)
+        return "-";
+      if (stamp.image_params.fallback_image)
+        return "Reset available";
+      return "Remove available";
+    }
   }
 
   if (role == Qt::EditRole) {
@@ -65,16 +71,37 @@ QVariant AdminModel::data(const QModelIndex &index, int role) const {
     if (column == kComments)
       return {QString::fromStdString(
           stamp.custom ? stamp.custom->comments.value_or("") : "")};
+    if (column == kCustomImageAction) {
+      return QString::fromStdString(
+          stamp.image_params.fallback_image.value_or(""));
+    }
   }
   if (role == Qt::UserRole) {
     if (column == kSwLink)
       return QString::fromStdString(stamp.sw_link);
     if (column == kImage)
       return QString::fromStdString(stamp.image);
+    if (column == kCustomImageAction) {
+      if (stamp.imageSource() == db::ImageSources::kPhoto) {
+        if (stamp.image_params.fallback_image)
+          return "Reset image";
+        return "Remove image";
+      }
+      return {};
+    }
   }
   if (role == Qt::DecorationRole) {
     if (column == kPresence)
       return stamp.owned ? QColor(Qt::green) : QColor(Qt::red);
+  }
+
+  if (role == Qt::ToolTipRole) {
+    if (column == kCapture)
+      return {QString::fromStdString(stamp.capture)};
+    if (column == kSeries)
+      return {QString::fromStdString(series)};
+    if (column == kColor)
+      return {QString::fromStdString(stamp.color)};
   }
 
   return {};
@@ -107,9 +134,11 @@ QVariant AdminModel::headerData(int section, Qt::Orientation orientation,
     if (section == kSwLink)
       return "Stampworld link";
     if (section == kForcedWishlist)
-      return "Forced wishlist";
+      return "Wish -f";
     if (section == kComments)
       return "Comments";
+    if (section == kCustomImageAction)
+      return "Image action";
   }
   return {};
 }
@@ -127,7 +156,8 @@ Qt::ItemFlags AdminModel::flags(const QModelIndex &index) const {
   using namespace admin::indexes;
   const auto column = index.column();
   auto defaultFlags = QAbstractTableModel::flags(index);
-  if (column == kForcedWishlist || column == kComments)
+  if (column == kForcedWishlist || column == kComments ||
+      column == kCustomImageAction)
     defaultFlags |= Qt::ItemIsEditable;
   return defaultFlags;
 }
@@ -168,6 +198,13 @@ bool AdminModel::setData(const QModelIndex &index, const QVariant &value,
       stamp.custom->comments = std::nullopt;
     emit dataChanged(index, index, {});
     emit customDataChanged();
+    return true;
+  }
+  if (column == kCustomImageAction) {
+    stamp.image = stamp.image_params.fallback_image.value_or("");
+    stamp.image_params.fallback_image = std::nullopt;
+    emit dataChanged(index, index, {});
+    emit imageDataChanged();
     return true;
   }
   return QAbstractTableModel::setData(index, value, role);

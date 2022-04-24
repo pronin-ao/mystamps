@@ -8,7 +8,9 @@
 #include "catalogue.h"
 #include "datamanager.h"
 
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_ANDROID)
+#undef MAKE_ADMIN
+#elif defined(Q_OS_LINUX)
 #define MAKE_ADMIN
 #include "admin.h"
 #endif
@@ -45,6 +47,8 @@ int main(int argc, char *argv[]) {
                      &DataManager::registerStampChecked);
     QObject::connect(catalogue, &Catalogue::sendShowMode, &db,
                      &DataManager::applyShowMode);
+    QObject::connect(catalogue, &Catalogue::saveImageForStamp, &db,
+                     &DataManager::saveImageForStamp);
 
     void (Catalogue::*setCountries_rval)(QSharedPointer<QStringList>) =
         &Catalogue::setCountries;
@@ -76,8 +80,10 @@ int main(int argc, char *argv[]) {
     admin.show();
     QObject::connect(&db, &DataManager::sendDbPointer, &admin,
                      &Admin::setDbPointerToModel);
-    QObject::connect(&admin, &Admin::dataChanged, &db,
+    QObject::connect(&admin, &Admin::customDataChanged, &db,
                      &DataManager::saveCustomData);
+    QObject::connect(&admin, &Admin::imageDataChanged, &db,
+                     &DataManager::saveImageData);
     db.initiateDataForAdmin();
 #endif // MAKE_ADMIN
     return a.exec();

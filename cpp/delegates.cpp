@@ -2,14 +2,17 @@
 
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QPushButton>
+
+#include <QDebug>
 
 #include "adminmodel.h"
 
 WishlistDelegate::WishlistDelegate(QObject *parent) : QItemDelegate(parent) {}
 
 QWidget *WishlistDelegate::createEditor(QWidget *parent,
-                                        const QStyleOptionViewItem & /*option*/,
-                                        const QModelIndex & /*index*/) const {
+                                        const QStyleOptionViewItem &,
+                                        const QModelIndex &) const {
   return new QCheckBox(parent);
 }
 
@@ -34,29 +37,66 @@ void WishlistDelegate::updateEditorGeometry(QWidget *editor,
   editor->setGeometry(option.rect);
 }
 
-CommenstDelegate::CommenstDelegate(QObject *parent) : QItemDelegate(parent) {}
+CommentsDelegate::CommentsDelegate(QObject *parent) : QItemDelegate(parent) {}
 
-QWidget *CommenstDelegate::createEditor(QWidget *parent,
-                                        const QStyleOptionViewItem &option,
-                                        const QModelIndex &index) const {
+QWidget *CommentsDelegate::createEditor(QWidget *parent,
+                                        const QStyleOptionViewItem &,
+                                        const QModelIndex &) const {
   return new QLineEdit(parent);
 }
 
-void CommenstDelegate::setEditorData(QWidget *editor,
+void CommentsDelegate::setEditorData(QWidget *editor,
                                      const QModelIndex &index) const {
   const auto &comments = index.model()->data(index, Qt::EditRole).toString();
   auto lineedit = qobject_cast<QLineEdit *>(editor);
   lineedit->setText(comments);
 }
 
-void CommenstDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+void CommentsDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const {
   auto lineedit = qobject_cast<QLineEdit *>(editor);
-  model->setData(index, lineedit->text(), Qt::EditRole);
+  const auto &comment = lineedit->text() == "-" ? "" : lineedit->text();
+  model->setData(index, comment, Qt::EditRole);
 }
 
-void CommenstDelegate::updateEditorGeometry(QWidget *editor,
+void CommentsDelegate::updateEditorGeometry(QWidget *editor,
                                             const QStyleOptionViewItem &option,
-                                            const QModelIndex &index) const {
+                                            const QModelIndex &) const {
+  editor->setGeometry(option.rect);
+}
+
+ImageActionDelegate::ImageActionDelegate(QObject *parent)
+    : QItemDelegate(parent) {}
+
+QWidget *ImageActionDelegate::createEditor(QWidget *parent,
+                                           const QStyleOptionViewItem &,
+                                           const QModelIndex &index) const {
+  const auto &action = index.model()->data(index, Qt::UserRole).toString();
+  if (!action.isEmpty()) {
+    auto button = new QPushButton(parent);
+    button->setMinimumWidth(100);
+    return button;
+  }
+  return nullptr;
+}
+
+void ImageActionDelegate::setEditorData(QWidget *editor,
+                                        const QModelIndex &index) const {
+  const auto &action = index.model()->data(index, Qt::UserRole).toString();
+  if (!action.isEmpty()) {
+    auto button = qobject_cast<QPushButton *>(editor);
+    button->setText(action);
+  }
+}
+
+void ImageActionDelegate::setModelData(QWidget *, QAbstractItemModel *model,
+                                       const QModelIndex &index) const {
+  const auto &new_image = index.model()->data(index, Qt::EditRole).toString();
+  model->setData(index, new_image, Qt::EditRole);
+}
+
+void ImageActionDelegate::updateEditorGeometry(
+    QWidget *editor, const QStyleOptionViewItem &option,
+    const QModelIndex &) const {
   editor->setGeometry(option.rect);
 }

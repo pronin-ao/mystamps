@@ -4,6 +4,8 @@
 #include <QCompleter>
 #include <QDesktopServices>
 #include <QLabel>
+#include <QPushButton>
+#include <QStyle>
 #include <QUrl>
 
 #include "urlimagelabel.h"
@@ -17,18 +19,32 @@ static const QString kLink = "<a href=%2>%1<\\a>";
 Admin::Admin(QWidget *parent)
     : QWidget(parent), ui(new Ui::AdminGui), network(this), proxyModel(this) {
   ui->setupUi(this);
+  ui->update->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+
   proxyModel.setSourceModel(&sourceModel);
   proxyModel.setFilterKeyColumn(0);
   ui->tableView->setModel(&proxyModel);
   ui->tableView->setSortingEnabled(true);
   ui->tableView->setItemDelegateForColumn(admin::indexes::kForcedWishlist,
                                           &wishListDelegate);
+  ui->tableView->setItemDelegateForColumn(admin::indexes::kComments,
+                                          &commentsDelegate);
+  ui->tableView->setItemDelegateForColumn(admin::indexes::kCustomImageAction,
+                                          &imageActionDelegate);
   ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   connect(ui->apply, &QPushButton::clicked, this, &Admin::applyFilter);
   connect(&sourceModel, &AdminModel::customDataChanged, this,
-          &Admin::dataChanged);
+          &Admin::customDataChanged);
+  connect(&sourceModel, &AdminModel::imageDataChanged, this,
+          &Admin::imageDataChanged);
+
+  connect(ui->update, &QPushButton::clicked,
+          [table = ui->tableView, admin = this]() {
+            table->reset();
+            admin->CreateItemWidgets();
+          });
 }
 
 Admin::~Admin() { delete ui; }
@@ -58,17 +74,28 @@ void Admin::CreateItemWidgets() {
     {
       const auto &cur = proxyModel.index(i, admin::indexes::kSwLink, {});
       const auto &link = proxyModel.data(cur, Qt::UserRole).toString();
-      ui->tableView->setIndexWidget(cur, new QLabel{});
+      if (!ui->tableView->indexWidget(cur))
+        ui->tableView->setIndexWidget(cur, new QLabel{});
       const auto label =
           qobject_cast<QLabel *>(ui->tableView->indexWidget(cur));
       label->setTextFormat(Qt::RichText);
-      label->setText(kLink.arg(link, link));
+      label->setText(kLink.arg("Stampworld link", link));
       label->setOpenExternalLinks(true);
     }
     {
       const auto &cur = proxyModel.index(i, admin::indexes::kImage, {});
       const auto &image = proxyModel.data(cur, Qt::UserRole).toString();
-      ui->tableView->setIndexWidget(cur, new UrlImageLabel{image, &network});
+      if (!ui->tableView->indexWidget(cur))
+        ui->tableView->setIndexWidget(cur, new UrlImageLabel{image, &network});
     }
   }
+  connect(&proxyModel, &AdminModel::dataChanged,
+          [&](const auto &index1, const auto &index2, const auto &) {
+            for (int i = index1.row(); i <= index2.row(); ++i) {
+              const auto &cur = proxyModel.index(i, admin::indexes::kImage, {});
+              const auto label = qobject_cast<UrlImageLabel *>(
+                  ui->tableView->indexWidget(cur));
+              label->setUrl(proxyModel.data(cur, Qt::UserRole).toString());
+            }
+          });
 }

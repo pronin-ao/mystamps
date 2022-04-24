@@ -23,8 +23,10 @@ public slots:
   void applyShowMode(const QString &showMode);
 
   void registerStampChecked(const Stamp &stamp);
+  void saveImageForStamp(const Stamp &stamp, const QString &image_file);
 
   void saveCustomData() const;
+  void saveImageData() const;
 
 private:
   db::Catalogue _db;
@@ -33,7 +35,8 @@ private:
   void filterYearsForCountry();
   void filterPriceForYears();
 
-  void saveAddToFile();
+  void saveUserToFile() const;
+  void saveImagesToFile() const;
 
   std::set<std::string> _countries;
   std::set<std::string> _years;

@@ -18,10 +18,25 @@ public:
                             const QModelIndex &index) const override;
 };
 
-class CommenstDelegate : public QItemDelegate {
+class CommentsDelegate : public QItemDelegate {
 
 public:
-  CommenstDelegate(QObject *parent = nullptr);
+  CommentsDelegate(QObject *parent = nullptr);
+
+  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                        const QModelIndex &index) const override;
+  void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+  void setModelData(QWidget *editor, QAbstractItemModel *model,
+                    const QModelIndex &index) const override;
+
+  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+                            const QModelIndex &index) const override;
+};
+
+class ImageActionDelegate : public QItemDelegate {
+
+public:
+  ImageActionDelegate(QObject *parent = nullptr);
 
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                         const QModelIndex &index) const override;

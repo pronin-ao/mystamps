@@ -1,20 +1,12 @@
 #include "datamanager.h"
 
+#include <QBuffer>
 #include <QFile>
 
 #include <QDebug>
 
+#include "data_constants.h"
 #include "dbparser.h"
-
-#if defined(Q_OS_ANDROID)
-const QString dbFilename = "/sdcard/stamps/stamp_base.json";
-const QString UserDataFile = "/sdcard/stamps//user_data.json";
-const QString CustomDataFile = "/sdcard/stamps//custom_data.json";
-#elif defined(Q_OS_LINUX)
-const QString dbFilename = "../stamp_base.json";
-const QString UserDataFile = "../user_data.json";
-const QString CustomDataFile = "../custom_data.json";
-#endif
 
 QString ReadFile(const QString &filename) {
   QString val;
@@ -37,13 +29,15 @@ QStringList QStringListFromSet(const std::set<std::string> &set) {
 }
 
 DataManager::DataManager(QObject *parent) : QObject(parent) {
-  const auto &json = ReadFile(dbFilename);
+  const auto &json = ReadFile(paths::dbFilename);
   _db = ParseStampworldCatalogue(json);
   collectAllFilters();
-  const auto &user_json = ReadFile(UserDataFile);
+  const auto &user_json = ReadFile(paths::UserDataFile);
   ParseUserData(user_json, _db);
-  const auto &custom_json = ReadFile(CustomDataFile);
+  const auto &custom_json = ReadFile(paths::CustomDataFile);
   ParseCustomData(custom_json, _db);
+  const auto &image_json = ReadFile(paths::ImageDataFile);
+  ParseImagesData(image_json, _db);
   emit sendDbPointer(&_db);
 }
 
@@ -71,8 +65,8 @@ void DataManager::collectAllFilters() {
     qDebug() << QString::fromStdString(country) << " years: " << data.size();
     for (const auto &[year, year_data] : data) {
       _years.insert(year);
-      for (const auto &seriees : year_data) {
-        for (const auto &[_, stamp] : seriees.second) {
+      for (const auto &series : year_data) {
+        for (const auto &[_, stamp] : series.second) {
           _prices.insert(stamp.price);
         }
       }
@@ -118,10 +112,19 @@ void DataManager::filterPriceForYears() {
       QSharedPointer<QStringList>::create(QStringListFromSet(prices)));
 }
 
-void DataManager::saveAddToFile() {
+void DataManager::saveUserToFile() const {
   const auto &new_data = SerializeUserData(_db);
   QFile file;
-  file.setFileName(UserDataFile);
+  file.setFileName(paths::UserDataFile);
+  file.open(QIODevice::WriteOnly | QIODevice::Text);
+  file.write(new_data.toUtf8());
+  file.close();
+}
+
+void DataManager::saveImagesToFile() const {
+  const auto &new_data = SerializeImagesData(_db);
+  QFile file;
+  file.setFileName(paths::ImageDataFile);
   file.open(QIODevice::WriteOnly | QIODevice::Text);
   file.write(new_data.toUtf8());
   file.close();
@@ -236,17 +239,41 @@ void DataManager::applyShowMode(const QString &showMode) {
 }
 
 void DataManager::registerStampChecked(const Stamp &st) {
-  _db[st._country.toStdString()][st._year.toStdString()]
-     [st._series.toStdString()][st._id.toStdString()]
-         .user.checked = st._checked;
-  saveAddToFile();
+  _db.at(st._country.toStdString())
+      .at(st._year.toStdString())
+      .at(st._series.toStdString())
+      .at(st._id.toStdString())
+      .user.checked = st._checked;
+  saveUserToFile();
+}
+
+void DataManager::saveImageForStamp(const Stamp &st,
+                                    const QString &image_file) {
+  QFile file(image_file);
+  file.open(QIODevice::ReadOnly);
+  QByteArray image = file.readAll();
+  if (file.exists())
+    while (!file.remove())
+      ;
+  qDebug() << st._country << st._year << st._series << st._id;
+  auto &stamp = _db.at(st._country.toStdString())
+                    .at(st._year.toStdString())
+                    .at(st._series.toStdString())
+                    .at(st._id.toStdString());
+  if (!stamp.image.empty())
+    stamp.image_params.fallback_image = stamp.image;
+  stamp.image = (codes::kBase64Image + image.toBase64()).toStdString();
+  applyCountriesFilter(_country_filter);
+  saveImagesToFile();
 }
 
 void DataManager::saveCustomData() const {
   const auto &new_data = SerializeCustomData(_db);
   QFile file;
-  file.setFileName(CustomDataFile);
+  file.setFileName(paths::CustomDataFile);
   file.open(QIODevice::WriteOnly | QIODevice::Text);
   file.write(new_data.toUtf8());
   file.close();
 }
+
+void DataManager::saveImageData() const { saveImagesToFile(); }

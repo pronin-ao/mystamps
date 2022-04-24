@@ -22,6 +22,7 @@ class Catalogue : public QObject {
   Q_PROPERTY(
       QStringList prices READ prices WRITE setPrices NOTIFY pricesChanged)
   Q_PROPERTY(QString showMode READ showMode WRITE applyShowMode)
+  Q_PROPERTY(QString location READ location)
 
   QML_ELEMENT
 
@@ -37,6 +38,7 @@ public:
   inline auto stamps() const { return *_stamps; }
   inline auto sorting() const { return _sorting; }
   inline auto order() const { return _order; }
+  inline auto location() const { return _location; }
 
 public slots:
   void setStamps(QSharedPointer<QVariantList> stamps);
@@ -66,6 +68,8 @@ public slots:
 
   void filter(QString text, QString filterType);
 
+  void getImage(const Stamp &stamp, const QString &image);
+
 signals:
   void yearsChanged();
   void countriesChanged();
@@ -83,6 +87,7 @@ signals:
   void orderChanged();
 
   void stampChanges(const Stamp &);
+  void saveImageForStamp(const Stamp &, const QString &);
 
   void getFilter(const QStringList &list);
   void countriesFilterChanged();
@@ -92,6 +97,8 @@ private:
   QSharedPointer<QStringList> _countries =
       QSharedPointer<QStringList>::create();
   QSharedPointer<QStringList> _prices = QSharedPointer<QStringList>::create();
+
+  QString _location;
 
   QStringList _fullYears = {};
   QStringList _fullCountries = {};

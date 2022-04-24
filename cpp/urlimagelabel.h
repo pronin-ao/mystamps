@@ -9,10 +9,13 @@ class UrlImageLabel : public QLabel {
 public:
   UrlImageLabel(const QString &url, QNetworkAccessManager *network,
                 QWidget *parent = nullptr);
+  void setUrl(const QString &url);
 
 private:
   QNetworkAccessManager *_network;
   QLabel *_bigPicture = nullptr;
+  QNetworkReply *_response = nullptr;
+  QString _url;
 
 protected:
   void enterEvent(QEvent *event) override;

@@ -23,11 +23,12 @@ static const int kSpec = 9;
 static const int kSeries = 10;
 static const int kCapture = 11;
 static const int kComments = 12;
+static const int kCustomImageAction = 13;
 
 } // namespace admin::indexes
 
 class AdminModel : public QAbstractTableModel {
-  static const int kSize = 13;
+  static const int kSize = 14;
   Q_OBJECT
 public:
   AdminModel();
@@ -55,6 +56,7 @@ private:
 
 signals:
   void customDataChanged();
+  void imageDataChanged();
 };
 
 #endif // ADMINMODEL_H
