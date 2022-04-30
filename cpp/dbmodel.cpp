@@ -5,6 +5,8 @@
 namespace db {
 
 ImageSources Stamp::imageSource() const {
+  if (image.empty())
+    return ImageSources::kNoImage;
   if (image.substr(0, codes::kBase64Image.size()) ==
       codes::kBase64Image.toStdString())
     return ImageSources::kPhoto;

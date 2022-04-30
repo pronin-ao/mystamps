@@ -9,8 +9,7 @@ SOURCES += main.cpp \
     catalogue.cpp \
     datamanager.cpp \
     dbmodel.cpp \
-    dbparser.cpp \
-    urlimagelabel.cpp
+    dbparser.cpp
 
 HEADERS += \
     catalogue.h \
@@ -19,8 +18,7 @@ HEADERS += \
     datamanager.h \
     dbmodel.h \
     dbparser.h \
-    stamp.h \
-    urlimagelabel.h
+    stamp.h
 
 RESOURCES += \
     res.qrc
@@ -49,12 +47,15 @@ CONFIG(admin): {
         delegates.cpp \
         adminmodel.cpp \
         adminproxymodel.cpp \
-        admin.cpp
+        admin.cpp\
+        urlimagelabel.cpp
     HEADERS += \
         delegates.h \
         adminmodel.h \
         adminproxymodel.h \
-        admin.h
+        admin.h \
+        urlimagelabel.h
+
     QTWEBENGINE_CHROMIUM_FLAGS=--ignore-gpu-blacklist
 } else {
     message(Building without admin.)

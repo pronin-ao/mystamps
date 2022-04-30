@@ -59,6 +59,7 @@ EUROPA = [
 ]
 
 AFRICA = [
+    'Algeria',
     'UAR',
     'Angola',
     'Belgian-Congo',  # !

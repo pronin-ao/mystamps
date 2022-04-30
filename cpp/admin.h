@@ -23,6 +23,7 @@ public slots:
   void setDbPointerToModel(db::Catalogue *db);
 
   void applyFilter();
+  void addStamp();
 
 private:
   Ui::AdminGui *ui;
@@ -34,6 +35,9 @@ private:
   ImageActionDelegate imageActionDelegate;
 
   void CreateItemWidgets();
+  void setWidgetsToRow(const int row);
+  void setLinkToRow(const int row);
+  void setImageLabelToRow(const int row);
 
 signals:
   void customDataChanged();

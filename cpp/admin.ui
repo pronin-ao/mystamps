@@ -14,9 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="country"/>
-   </item>
    <item row="0" column="3">
     <widget class="QLineEdit" name="year">
      <property name="maximumSize">
@@ -30,12 +27,8 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>COUNTRY</string>
-     </property>
-    </widget>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="country"/>
    </item>
    <item row="0" column="4">
     <widget class="QPushButton" name="apply">
@@ -51,6 +44,13 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>COUNTRY</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="5">
     <widget class="QPushButton" name="update">
      <property name="text">
@@ -58,7 +58,14 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="6">
+   <item row="0" column="6">
+    <widget class="QPushButton" name="add">
+     <property name="text">
+      <string>ADD</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="7">
     <widget class="QTableView" name="tableView"/>
    </item>
   </layout>

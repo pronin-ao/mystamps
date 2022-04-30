@@ -14,10 +14,10 @@ struct CustomParams {
   std::optional<bool> forced_wishlist = std::nullopt;
   std::optional<std::string> comments = std::nullopt;
 
-  inline bool has_value() { return forced_wishlist || comments; }
+  inline bool has_value() const { return forced_wishlist || comments; }
 };
 
-enum class ImageSources { kStampworld, kPhoto };
+enum class ImageSources { kStampworld, kPhoto, kNoImage };
 
 using Image = std::string;
 using Spec = std::string;
@@ -44,7 +44,7 @@ struct Stamp {
   Color color = "";
   bool owned = false;
   Conditions condition{};
-  Link sw_link = "";
+  Link link = "";
   bool has_list = false;
   ListNote list_note;
   std::optional<bool> list_owned;

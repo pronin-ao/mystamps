@@ -17,7 +17,7 @@ static const int kPresence = 3;
 static const int kForcedWishlist = 4;
 static const int kImage = 5;
 static const int kPrice = 6;
-static const int kSwLink = 7;
+static const int kLink = 7;
 static const int kColor = 8;
 static const int kSpec = 9;
 static const int kSeries = 10;
@@ -49,6 +49,8 @@ public:
 
 public slots:
   void setDbPointer(db::Catalogue *db);
+
+  bool addStamp();
 
 private:
   DbHash _hash = {};

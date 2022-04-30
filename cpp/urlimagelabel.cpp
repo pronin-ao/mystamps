@@ -10,7 +10,6 @@ UrlImageLabel::UrlImageLabel(const QString &url, QNetworkAccessManager *network,
 
 void UrlImageLabel::setUrl(const QString &url) {
   if (_url == url) {
-    qDebug() << url;
     return;
   }
   _url = url;

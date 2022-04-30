@@ -29,7 +29,7 @@ QStringList QStringListFromSet(const std::set<std::string> &set) {
 }
 
 DataManager::DataManager(QObject *parent) : QObject(parent) {
-  const auto &json = ReadFile(paths::dbFilename);
+  const auto &json = ReadFile(paths::dbStampworldFile);
   _db = ParseStampworldCatalogue(json);
   collectAllFilters();
   const auto &user_json = ReadFile(paths::UserDataFile);
@@ -214,7 +214,7 @@ void DataManager::applyPriceFilter(const QStringList &filter) {
                        (!stamp.second.custom ||
                         !stamp.second.custom->forced_wishlist.value_or(false))),
                       std::move(conds),
-                      QString::fromStdString(stamp.second.sw_link),
+                      QString::fromStdString(stamp.second.link),
                       stamp.second.has_list,
                       QString::fromStdString(
                           stamp.second.list_note.value_or("")),

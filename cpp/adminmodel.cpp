@@ -5,10 +5,6 @@
 #include <QIcon>
 #include <QUrl>
 
-namespace {
-static const QModelIndex nulli = QModelIndex();
-}
-
 AdminModel::AdminModel() : QAbstractTableModel() {}
 
 int AdminModel::columnCount(const QModelIndex &) const {
@@ -77,8 +73,8 @@ QVariant AdminModel::data(const QModelIndex &index, int role) const {
     }
   }
   if (role == Qt::UserRole) {
-    if (column == kSwLink)
-      return QString::fromStdString(stamp.sw_link);
+    if (column == kLink)
+      return QString::fromStdString(stamp.link);
     if (column == kImage)
       return QString::fromStdString(stamp.image);
     if (column == kCustomImageAction) {
@@ -102,6 +98,8 @@ QVariant AdminModel::data(const QModelIndex &index, int role) const {
       return {QString::fromStdString(series)};
     if (column == kColor)
       return {QString::fromStdString(stamp.color)};
+    if (column == kLink)
+      return QString::fromStdString(stamp.link);
   }
 
   return {};
@@ -131,8 +129,8 @@ QVariant AdminModel::headerData(int section, Qt::Orientation orientation,
       return "Presence";
     if (section == kColor)
       return "Color";
-    if (section == kSwLink)
-      return "Stampworld link";
+    if (section == kLink)
+      return "Source link";
     if (section == kForcedWishlist)
       return "Wish -f";
     if (section == kComments)
@@ -224,8 +222,34 @@ void AdminModel::setDbPointer(db::Catalogue *db) {
       }
     }
   }
-  beginInsertRows(nulli, 0, counter - 1);
+  beginInsertRows({}, 0, counter - 1);
   _hash = std::move(tmp);
   endInsertRows();
-  emit dataChanged(index(0, 0, nulli), index(_hash.size(), 20, nulli));
+  emit dataChanged(index(0, 0, {}),
+                   index(_hash.size() - 1, AdminModel::kSize - 1, {}), {});
+}
+
+bool AdminModel::addStamp() {
+  using namespace std::string_literals;
+  // check if exists
+
+  // create new tmp
+  db::Stamp newone;
+  newone.link = "http://www.yandex.ru";
+  newone.code = "NEWONE";
+  newone.price = "42";
+  newone.spec = "default";
+  newone.condition = {"***"};
+
+  (*_db)["Austria"]["2032"]["series"]["100500"] = std::move(newone);
+
+  beginInsertRows({}, _hash.size(), _hash.size());
+  _hash.emplace(_hash.size(),
+                std::make_tuple("Austria"s, "2032"s, "series"s, "100500"s));
+  endInsertRows();
+  emit dataChanged(index(_hash.size() - 1, 0, {}),
+                   index(_hash.size() - 1, AdminModel::kSize - 1, {}), {});
+
+  // set to base
+  return false;
 }

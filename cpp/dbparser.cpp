@@ -1,5 +1,7 @@
 #include "dbparser.h"
 
+#include <functional>
+
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -56,7 +58,7 @@ db::Series ParseSeries(const QJsonObject &json, const Context &context) {
   if (!stamps_it->isObject())
     throw std::runtime_error("Stamps in not an object");
 
-  const auto &sw_link =
+  const auto &link =
       json.value(names::kSwLink).toString("").remove(-2, 2).toStdString();
   const bool has_list = json.value(names::kHasList).toBool(false);
   std::optional<bool> list_owned{};
@@ -100,7 +102,7 @@ db::Series ParseSeries(const QJsonObject &json, const Context &context) {
                         stamp.value(names::kColor).toString("").toStdString(),
                         stamp.value(names::kOwned).toBool(false),
                         std::move(cond),
-                        sw_link,
+                        link,
                         has_list,
                         list_note,
                         list_owned,
@@ -190,25 +192,34 @@ db::Catalogue ParseStampworldCatalogue(const QString &str) {
   return res;
 }
 ///////////////////////////////////////////////////////////////////////////////
-QJsonDocument AddParamsToJson(const db::Catalogue &db) {
+template <typename F> QJsonDocument SaveToJson(F f, const db::Catalogue &db) {
   QJsonArray res;
   for (const auto &[country, country_data] : db)
     for (const auto &[year, year_data] : country_data)
       for (const auto &[series, series_data] : year_data)
         for (const auto &[id, stamp_data] : series_data) {
-          QJsonObject stamp;
+          QJsonObject stamp{f(stamp_data)};
+          if (stamp.empty())
+            continue;
           stamp[names::kCountry] = QString::fromStdString(country);
           stamp[names::kYear] = QString::fromStdString(year);
           stamp[names::kSeries] = QString::fromStdString(series);
           stamp[names::kId] = QString::fromStdString(id);
-          stamp[names::kChecked] = stamp_data.user.checked;
           res.append(stamp);
         }
   return QJsonDocument(res);
 }
 
+QJsonObject UserParamsJson(const db::Stamp &stamp_data) {
+  if (!stamp_data.user.checked)
+    return {};
+  QJsonObject stamp;
+  stamp[names::kChecked] = stamp_data.user.checked;
+  return stamp;
+}
+
 QString SerializeUserData(const db::Catalogue &db) {
-  const auto &json = AddParamsToJson(db);
+  const auto &json = SaveToJson(UserParamsJson, db);
   return QString::fromUtf8(json.toJson());
 }
 
@@ -233,29 +244,21 @@ void ParseUserData(const QString &str, db::Catalogue &db) {
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
+QJsonObject CustomParamsJson(const db::Stamp &stamp_data) {
+  if (!stamp_data.custom)
+    return {};
+  QJsonObject stamp;
+  if (stamp_data.custom->forced_wishlist)
+    stamp[names::kForcedWihslist] = stamp_data.custom->forced_wishlist.value();
+  if (stamp_data.custom->comments)
+    stamp[names::kComments] =
+        QString::fromStdString(stamp_data.custom->comments.value());
+  return stamp;
+}
+
 QString SerializeCustomData(const db::Catalogue &db) {
-  QJsonArray res;
-  for (const auto &[country, country_data] : db)
-    for (const auto &[year, year_data] : country_data)
-      for (const auto &[series, series_data] : year_data)
-        for (const auto &[id, stamp_data] : series_data) {
-          if (!stamp_data.custom || !stamp_data.custom.has_value())
-            continue;
-          const auto &data = *stamp_data.custom;
-          QJsonObject stamp;
-          stamp[names::kCountry] = QString::fromStdString(country);
-          stamp[names::kYear] = QString::fromStdString(year);
-          stamp[names::kSeries] = QString::fromStdString(series);
-          stamp[names::kId] = QString::fromStdString(id);
-          if (stamp_data.custom->forced_wishlist)
-            stamp[names::kForcedWihslist] =
-                stamp_data.custom->forced_wishlist.value();
-          if (stamp_data.custom->comments)
-            stamp[names::kComments] =
-                QString::fromStdString(stamp_data.custom->comments.value());
-          res.append(stamp);
-        }
-  return QString::fromUtf8(QJsonDocument(res).toJson());
+
+  return QString::fromUtf8(SaveToJson(CustomParamsJson, db).toJson());
 }
 
 void ParseCustomData(const QString &str, db::Catalogue &db) {
@@ -284,24 +287,16 @@ void ParseCustomData(const QString &str, db::Catalogue &db) {
   }
 }
 
+QJsonObject ImageDataJson(const db::Stamp &stamp_data) {
+  QJsonObject stamp;
+  if (stamp_data.imageSource() == db::ImageSources::kPhoto)
+    stamp[names::kImage] = QString::fromStdString(stamp_data.image);
+  return stamp;
+}
+
 QString SerializeImagesData(const db::Catalogue &db) {
-  QJsonArray res;
-  for (const auto &[country, country_data] : db)
-    for (const auto &[year, year_data] : country_data)
-      for (const auto &[series, series_data] : year_data)
-        for (const auto &[id, stamp_data] : series_data) {
-          if (stamp_data.imageSource() != db::ImageSources::kPhoto)
-            continue;
-          const auto &data = *stamp_data.custom;
-          QJsonObject stamp;
-          stamp[names::kCountry] = QString::fromStdString(country);
-          stamp[names::kYear] = QString::fromStdString(year);
-          stamp[names::kSeries] = QString::fromStdString(series);
-          stamp[names::kId] = QString::fromStdString(id);
-          stamp[names::kImage] = QString::fromStdString(stamp_data.image);
-          res.append(stamp);
-        }
-  return QString::fromUtf8(QJsonDocument(res).toJson());
+
+  return QString::fromUtf8(SaveToJson(ImageDataJson, db).toJson());
 }
 
 void ParseImagesData(const QString &str, db::Catalogue &db) {

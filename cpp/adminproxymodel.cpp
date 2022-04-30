@@ -21,7 +21,7 @@ bool AdminProxyModel::filterAcceptsRow(int source_row,
   const bool countryOk =
       _country.isEmpty() ||
       sourceModel()->data(country).toString().contains(_country);
-  const bool yearOk = _country.isEmpty() ||
-                      sourceModel()->data(year).toString().contains(_year);
+  const bool yearOk =
+      _year.isEmpty() || sourceModel()->data(year).toString().contains(_year);
   return countryOk && yearOk;
 }
